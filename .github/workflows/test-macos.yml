@@ -1,0 +1,39 @@
+name: Test on macOS
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: macos-tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Go test (macOS)
+    runs-on: macos-latest
+    timeout-minutes: 15
+    env:
+      # Force the integration tests to use this runner's osacompile rather
+      # than an externally configured compiler-oracle directory.
+      APPLESCRIPT_COMPILER_ORACLE_DIR: ""
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Verify AppleScript compiler
+        run: test -x /usr/bin/osacompile
+
+      - name: Run full test suite
+        run: go test -v -count=1 -timeout=10m ./...
