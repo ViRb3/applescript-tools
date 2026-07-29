@@ -123,6 +123,30 @@ func TestPermissiveReferenceMismatchReusesHeader(t *testing.T) {
 	}
 }
 
+func TestPrimitiveObjectReferenceIsReusable(t *testing.T) {
+	p := &parser{
+		r: bytes.NewReader([]byte{
+			3, 0, 47, 0, 10, // integer 10 with reference ID 47
+		}),
+		opts: Options{Limits: DefaultLimits()},
+		refs: make([]refEntry, 48),
+	}
+	for index := range p.refs {
+		p.refs[index] = refEntry{state: refReserved, value: NIL}
+	}
+
+	value, err := p.loadObject(47)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if value != Integer(10) {
+		t.Fatalf("value = %#v, want 10", value)
+	}
+	if reused, ok := p.lookup(47); !ok || reused != value {
+		t.Fatalf("reference 47 = %#v, %v; want %#v, true", reused, ok, value)
+	}
+}
+
 func TestPrimitiveObjectReaders(t *testing.T) {
 	p := &parser{r: bytes.NewReader(nil), opts: Options{Limits: DefaultLimits()}}
 	if value, err := p.loadBody(-1, 3, 0xffff); err != nil || value != Integer(-1) {

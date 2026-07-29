@@ -1,6 +1,6 @@
 on «event emalcpma» theMessages given «class pmar»:theRule
     try
-        set handledCount to (count theMessages)
+        set handledCount to count theMessages
     on error messageText number numberValue
         return messageText & numberValue
     end try

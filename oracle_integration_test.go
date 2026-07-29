@@ -316,6 +316,23 @@ func TestFocusedOracleFixtures(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			if name == "root_reference_library" && oracle.backend == oracleLocal {
+				_, artifacts, err := oracle.compileSource(
+					string(sourceBytes),
+					name+"_availability",
+				)
+				artifacts.cleanup()
+				if err != nil {
+					// A named script library is resolved from the host's Script
+					// Libraries folders. The committed .scpt fixture still
+					// exercises decompilation on hosts without that optional
+					// development dependency.
+					if strings.Contains(err.Error(), "(-1728)") {
+						t.Skip("Kevin's Library is not installed")
+					}
+					t.Fatal(err)
+				}
+			}
 			options := DecompileOptions{Strict: true}
 			switch name {
 			case "ascii_recovery", "naive_list_edges", "naive_empty_concat":

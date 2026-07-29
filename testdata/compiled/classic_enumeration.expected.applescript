@@ -1,3 +1,3 @@
 on run
-    return (path to scripts folder from user domain)
+    return path to scripts folder from user domain
 end run

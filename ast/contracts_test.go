@@ -273,6 +273,21 @@ func TestCommandAndHandlerCallContracts(t *testing.T) {
 	}
 }
 
+func TestTopLevelExpressionOmitsRedundantParentheses(t *testing.T) {
+	f := contractFormatter(t)
+	if got := f.topLevelExpr(&CommandCall{Name: "path to", Arguments: []Argument{
+		DirectArgument{Value: &Me{}},
+	}}); got != "path to me" {
+		t.Errorf("top-level command = %q", got)
+	}
+	if got := f.topLevelExpr(&Coerce{
+		Value: &StringLiteral{Value: "value"},
+		Type:  &Keyword{Fallback: "string"},
+	}); got != `"value" as string` {
+		t.Errorf("top-level coercion = %q", got)
+	}
+}
+
 func TestControlAndCopyStatementContracts(t *testing.T) {
 	node := &Considering{Options: []string{"numeric strings"}, Body: []Stmt{
 		&Timeout{Seconds: &NumberLiteral{Integer: 10}, Body: []Stmt{

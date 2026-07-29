@@ -269,7 +269,14 @@ func (p *parser) loadObject(expected int16) (Value, error) {
 		}
 		return NIL, nil
 	}
-	return p.loadBody(h.ref, h.index, h.inlined)
+	value, err := p.loadBody(h.ref, h.index, h.inlined)
+	if err != nil {
+		return nil, err
+	}
+	if err := p.register(h.ref, value); err != nil {
+		return nil, err
+	}
+	return value, nil
 }
 
 func (p *parser) lookup(ref int16) (Value, bool) {
@@ -459,7 +466,13 @@ func (p *parser) loadList(size uint16) (Value, error) {
 		}
 		if h.index != 2 {
 			cur.Tail, err = p.loadBody(h.ref, h.index, h.inlined)
-			return head, err
+			if err != nil {
+				return nil, err
+			}
+			if err = p.register(h.ref, cur.Tail); err != nil {
+				return nil, err
+			}
+			return head, nil
 		}
 		if h.inlined != 2 {
 			if h.inlined != 0 {
@@ -521,6 +534,9 @@ func (p *parser) loadRecord(ref int16, size uint16) (Value, error) {
 		if h.index != 6 {
 			cur.Next, e = p.loadBody(h.ref, h.index, h.inlined)
 			if e != nil {
+				return nil, e
+			}
+			if e = p.register(h.ref, cur.Next); e != nil {
 				return nil, e
 			}
 			break

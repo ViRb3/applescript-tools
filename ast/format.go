@@ -120,7 +120,7 @@ func (f *Formatter) stmt(statement Stmt, indent int) string {
 	prefix := strings.Repeat("    ", indent)
 	switch node := statement.(type) {
 	case *Set:
-		return prefix + "set " + f.expr(node.Target, 0) + " to " + f.expr(node.Value, 0)
+		return prefix + "set " + f.expr(node.Target, 0) + " to " + f.topLevelExpr(node.Value)
 	case *Copy:
 		return prefix + "copy " + f.expr(node.Source, 0) + " to " + f.expr(node.Target, 0)
 	case *Expression:
@@ -203,7 +203,7 @@ func (f *Formatter) stmt(statement Stmt, indent int) string {
 		if node.Value == nil {
 			return prefix + "return"
 		}
-		return prefix + "return " + f.expr(node.Value, 0)
+		return prefix + "return " + f.topLevelExpr(node.Value)
 	case *ExitRepeat:
 		return prefix + "exit repeat"
 	case *Comment:
@@ -211,6 +211,17 @@ func (f *Formatter) stmt(statement Stmt, indent int) string {
 	default:
 		return prefix + "-- unsupported statement " + fmt.Sprintf("%T", statement)
 	}
+}
+
+func (f *Formatter) topLevelExpr(expression Expr) string {
+	formatted := f.expr(expression, 0)
+	switch expression.(type) {
+	case *Coerce, *CommandCall:
+		if len(formatted) >= 2 && formatted[0] == '(' && formatted[len(formatted)-1] == ')' {
+			return formatted[1 : len(formatted)-1]
+		}
+	}
+	return formatted
 }
 
 var precedence = map[BinaryKind]int{
