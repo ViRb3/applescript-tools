@@ -7,6 +7,7 @@ import (
 	"strings"
 	"unicode"
 
+	"applescript-tools/internal/macroman"
 	"applescript-tools/terminology"
 )
 
@@ -504,11 +505,10 @@ func rawCode(code []byte) string {
 			decoded.WriteByte(b)
 			continue
 		}
-		if character, ok := macRomanRune[b]; ok {
-			decoded.WriteRune(character)
-			continue
+		if b < 0x20 || b == 0x7f {
+			return "0x" + hex.EncodeToString(code)
 		}
-		return "0x" + hex.EncodeToString(code)
+		decoded.WriteRune(macroman.DecodeByte(b))
 	}
 	return decoded.String()
 }
@@ -538,8 +538,6 @@ func quoteString(value string) string {
 	b.WriteByte('"')
 	return b.String()
 }
-
-var macRomanRune = map[byte]rune{0xa5: '•', 0xad: '≠', 0xb2: '≤', 0xb3: '≥', 0xb5: 'µ', 0xbd: 'Ω', 0xc4: 'ƒ', 0xd6: '÷'}
 
 var reserved = map[string]bool{
 	"and": true, "as": true, "class": true, "considering": true, "continue": true, "copy": true, "else": true,

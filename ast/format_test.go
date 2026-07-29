@@ -45,6 +45,15 @@ func TestQuoteStringPreservesPrivateUseCharacters(t *testing.T) {
 	}
 }
 
+func TestRawCodeDecodesMacRoman(t *testing.T) {
+	if got := rawCode([]byte{'c', 'a', 'f', 0x8e}); got != "café" {
+		t.Fatalf("rawCode = %q", got)
+	}
+	if got := rawCode([]byte{'a', 0, 'b', 'c'}); got != "0x61006263" {
+		t.Fatalf("rawCode with control byte = %q", got)
+	}
+}
+
 func TestComputedSpecifierSelectorIsParenthesized(t *testing.T) {
 	script := &Script{Handlers: []*Handler{{
 		Name: "run", IsRunHandler: true,
