@@ -264,7 +264,10 @@ func (p *parser) loadObject(expected int16) (Value, error) {
 		p.diagnostics = append(p.diagnostics, Diagnostic{Offset: h.offset, Message: msg})
 		p.reuse = &h
 		p.refErrors++
-		if p.opts.Strict || p.refErrors >= 6 {
+		// A damaged reference vector can omit many IDs before it reaches the
+		// intact object held in reuse. Keep recovery bounded by the caller's
+		// reference limit instead of an unrelated small mismatch count.
+		if p.opts.Strict || p.refErrors >= p.opts.Limits.MaxReferences {
 			return nil, errors.New(msg)
 		}
 		return NIL, nil

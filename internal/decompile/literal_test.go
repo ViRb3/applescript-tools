@@ -146,6 +146,18 @@ func TestIdentifierRecoveryContracts(t *testing.T) {
 	if got := identifierValue(path, "arg_0"); got != "path" {
 		t.Fatalf("runtime-object identifier = %q, want path", got)
 	}
+	for code, want := range map[string]string{
+		"pnam": "name",
+		"vers": "version",
+	} {
+		value := uint64(0)
+		for _, b := range []byte(code) {
+			value = value<<8 | uint64(b)
+		}
+		if got := identifierValue(&fas.Object{Value: fas.Constant(value)}, "fallback"); got != want {
+			t.Fatalf("runtime-object identifier %q = %q, want %q", code, got, want)
+		}
+	}
 }
 
 func TestAppleScriptSpecialConstants(t *testing.T) {
@@ -165,5 +177,33 @@ func TestAppleScriptSpecialConstants(t *testing.T) {
 		if !ok || keyword.Fallback != want {
 			t.Errorf("%s = %#v, want fallback %q", code, keyword, want)
 		}
+	}
+}
+
+func TestUnicodeWrapperPreservesDamagedASCIIPayload(t *testing.T) {
+	value := &fas.Vector{
+		HasType: true,
+		Type:    177,
+		Children: []fas.Value{
+			fas.NIL,
+			&fas.Bytes{Data: []byte("/dev/disk")},
+		},
+	}
+	got, ok := literal(value).(*ast.StringLiteral)
+	if !ok || got.Value != "/dev/disk" {
+		t.Fatalf("literal = %#v, want printable ASCII string", got)
+	}
+
+	utf16 := &fas.Vector{
+		HasType: true,
+		Type:    177,
+		Children: []fas.Value{
+			fas.NIL,
+			&fas.Bytes{Data: []byte{0, 'o', 0, 'k'}},
+		},
+	}
+	got, ok = literal(utf16).(*ast.StringLiteral)
+	if !ok || got.Value != "ok" {
+		t.Fatalf("literal = %#v, want UTF-16BE string", got)
 	}
 }

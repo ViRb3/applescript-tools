@@ -263,7 +263,10 @@ func Default() (*Registry, error) {
 func addBuiltins(registry *Registry) {
 	for codeText, name := range map[string]string{
 		"ascrcmnt": "log",
+		"ascrnoop": "launch",
 		"aevtoapp": "run",
+		"CoRedelo": "delete",
+		"CoRedoex": "exists",
 	} {
 		code, err := ParseEventCode(codeText)
 		if err != nil {
@@ -276,10 +279,20 @@ func addBuiltins(registry *Registry) {
 	for codeText, name := range map[string]string{
 		"leng": "length", "bool": "boolean", "long": "integer", "doub": "real", "TEXT": "string", "ctxt": "text",
 		"cobj": "item", "pcnt": "contents", "pnam": "name", "psxf": "POSIX file", "scpt": "script",
+		"citm": "text item", "obj ": "reference", "rvse": "reverse", "utxt": "Unicode text",
+		"null": "null", "insl": "location reference", "qdrt": "bounding rectangle",
+		"prdt": "with properties", "alrp": "replacing", "kocl": "new", "insh": "at",
 		"errn": "number", "ptlr": "partial result", "erob": "from", "errt": "to", "from": "from",
 		"prun": "running", "msng": "missing value", "rtyp": "as",
 		"txdl": "text item delimiters", "ascr": "AppleScript",
 		"fltp": "as", "kfil": "in", "ldt ": "date",
+		"wkdy": "weekday", "mnth": "month", "day ": "day", "year": "year",
+		"hour": "hours", "min ": "minutes", "scnd": "seconds", "days": "days",
+		"jan ": "January", "feb ": "February", "mar ": "March", "apr ": "April",
+		"may ": "May", "jun ": "June", "jul ": "July", "aug ": "August",
+		"sep ": "September", "oct ": "October", "nov ": "November", "dec ": "December",
+		"sun ": "Sunday", "mon ": "Monday", "tue ": "Tuesday", "wed ": "Wednesday",
+		"thu ": "Thursday", "fri ": "Friday", "sat ": "Saturday",
 		"FTPc": "path", "lnfd": "linefeed", "rslt": "result", "spac": "space", "strq": "quoted form",
 		"fixd": "fixed", "scrƒ": "scripts folder",
 		"asup": "application support",

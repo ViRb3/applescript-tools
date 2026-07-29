@@ -73,6 +73,20 @@ func TestLanguageBuiltins(t *testing.T) {
 		"fltp": "as",
 		"kfil": "in",
 		"ldt ": "date",
+		"citm": "text item",
+		"obj ": "reference",
+		"rvse": "reverse",
+		"utxt": "Unicode text",
+		"wkdy": "weekday",
+		"mnth": "month",
+		"day ": "day",
+		"year": "year",
+		"hour": "hours",
+		"min ": "minutes",
+		"jan ": "January",
+		"dec ": "December",
+		"prdt": "with properties",
+		"alrp": "replacing",
 	} {
 		code, err := ParseCode4(text)
 		if err != nil {
@@ -80,6 +94,26 @@ func TestLanguageBuiltins(t *testing.T) {
 		}
 		if got, ok := registry.Term(code); !ok || got != want {
 			t.Errorf("Term(%q) = %q, %v; want %q", text, got, ok, want)
+		}
+	}
+}
+
+func TestLanguageBuiltinCommands(t *testing.T) {
+	registry, err := Default()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for codeText, want := range map[string]string{
+		"ascrnoop": "launch",
+		"CoRedelo": "delete",
+		"CoRedoex": "exists",
+	} {
+		code, err := ParseEventCode(codeText)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got, ok := registry.Command(code); !ok || got.Name != want {
+			t.Errorf("Command(%q) = %#v, %v; want %q", codeText, got, ok, want)
 		}
 	}
 }

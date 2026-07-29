@@ -146,6 +146,10 @@ func constant(value uint64) ast.Expr {
 		return &ast.Keyword{Code: raw, Fallback: "space"}
 	case "strq":
 		return &ast.Keyword{Code: raw, Fallback: "quoted form"}
+	case "pnam":
+		return &ast.Keyword{Code: raw, Fallback: "name"}
+	case "vers":
+		return &ast.Keyword{Code: raw, Fallback: "version"}
 	}
 	if len(raw) == 8 {
 		return &ast.Keyword{Code: raw}
@@ -227,6 +231,23 @@ func legacyApplicationName(name string) string {
 }
 
 func utf16String(data []byte) string {
+	// Damaged object graphs occasionally retain an ordinary byte string under
+	// a Unicode-text wrapper. Decoding pairs such as "/d" as UTF-16BE produces
+	// plausible but incorrect CJK characters and hides useful forensic text.
+	// Real UTF-16BE ASCII contains NUL high bytes, so an entirely printable
+	// ASCII payload is safe to preserve as-is.
+	if len(data) != 0 {
+		printableASCII := true
+		for _, value := range data {
+			if value < 0x20 || value > 0x7e {
+				printableASCII = false
+				break
+			}
+		}
+		if printableASCII {
+			return string(data)
+		}
+	}
 	if len(data)%2 != 0 {
 		return string(data)
 	}

@@ -123,6 +123,55 @@ func TestPermissiveReferenceMismatchReusesHeader(t *testing.T) {
 	}
 }
 
+func TestPermissiveReferenceMismatchRecoveryIsNotLimitedToFive(t *testing.T) {
+	p := &parser{
+		r:    bytes.NewReader([]byte{3, 0, 47, 0, 7}),
+		opts: Options{Limits: DefaultLimits()},
+		refs: make([]refEntry, 48),
+	}
+	for index := range p.refs {
+		p.refs[index] = refEntry{state: refReserved, value: NIL}
+	}
+
+	for expected := int16(32); expected < 47; expected++ {
+		value, err := p.loadObject(expected)
+		if err != nil {
+			t.Fatalf("missing reference %d: %v", expected, err)
+		}
+		if value != NIL {
+			t.Fatalf("missing reference %d = %#v, want nil", expected, value)
+		}
+	}
+	value, err := p.loadObject(47)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if value != Integer(7) || p.reuse != nil || len(p.diagnostics) != 15 {
+		t.Fatalf("recovery = value %#v, reuse %#v, diagnostics %d", value, p.reuse, len(p.diagnostics))
+	}
+}
+
+func TestPermissiveReferenceMismatchRecoveryRespectsReferenceLimit(t *testing.T) {
+	limits := DefaultLimits()
+	limits.MaxReferences = 3
+	p := &parser{
+		r:     bytes.NewReader([]byte{3, 0, 47, 0, 7}),
+		opts:  Options{Limits: limits},
+		refs:  make([]refEntry, 1),
+		reuse: nil,
+	}
+
+	for expected := int16(0); expected < 2; expected++ {
+		if _, err := p.loadObject(expected); err != nil {
+			t.Fatalf("mismatch %d: %v", expected, err)
+		}
+	}
+	if _, err := p.loadObject(2); err == nil ||
+		!strings.Contains(err.Error(), "expected 2, found 47") {
+		t.Fatalf("third mismatch error = %v", err)
+	}
+}
+
 func TestPrimitiveObjectReferenceIsReusable(t *testing.T) {
 	p := &parser{
 		r: bytes.NewReader([]byte{
