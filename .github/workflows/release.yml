@@ -31,7 +31,32 @@ jobs:
 
     steps:
       - name: Update release pull request or publish release
+        id: release
         uses: googleapis/release-please-action@v4
         with:
           release-type: go
           target-branch: master
+
+      - name: Check out released tag
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.release.outputs.tag_name }}
+
+      - name: Set up Go
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build and attach release binaries
+        if: ${{ steps.release.outputs.release_created }}
+        uses: goreleaser/goreleaser-action@v7
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
