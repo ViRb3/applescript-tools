@@ -11,6 +11,8 @@ import (
 	"sort"
 	"strings"
 	"sync"
+
+	"applescript-tools/internal/macroman"
 )
 
 type Code4 [4]byte
@@ -46,11 +48,7 @@ func parseCode(value string, width int) ([]byte, error) {
 	}
 	raw := make([]byte, 0, width)
 	for _, character := range value {
-		if character <= 0x7f {
-			raw = append(raw, byte(character))
-			continue
-		}
-		encoded, ok := macRoman[character]
+		encoded, ok := macroman.EncodeRune(character)
 		if !ok {
 			return nil, fmt.Errorf("code %q contains a character unavailable in MacRoman", value)
 		}
@@ -60,17 +58,6 @@ func parseCode(value string, width int) ([]byte, error) {
 		return nil, fmt.Errorf("invalid %d-byte code %q", width, value)
 	}
 	return raw, nil
-}
-
-var macRoman = map[rune]byte{
-	'•': 0xa5,
-	'≠': 0xad,
-	'≤': 0xb2,
-	'≥': 0xb3,
-	'µ': 0xb5,
-	'Ω': 0xbd,
-	'ƒ': 0xc4,
-	'÷': 0xd6,
 }
 
 type Parameter struct {

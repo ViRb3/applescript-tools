@@ -180,3 +180,13 @@ func TestMacRomanFourCharacterCode(t *testing.T) {
 		t.Fatalf("code = %#v", code)
 	}
 }
+
+func TestMacRomanFourCharacterCodeUsesCompleteRepertoire(t *testing.T) {
+	code, err := ParseCode4("café")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if code != (Code4{'c', 'a', 'f', 0x8e}) {
+		t.Fatalf("code = %#v", code)
+	}
+}
