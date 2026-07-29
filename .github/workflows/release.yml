@@ -1,0 +1,62 @@
+name: Semantic release
+
+on:
+  workflow_run:
+    workflows:
+      - Test on macOS
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: semantic-release-master
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release Please
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_branch == 'master'
+      )
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Update release pull request or publish release
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          release-type: go
+          target-branch: master
+
+      - name: Check out released tag
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.release.outputs.tag_name }}
+
+      - name: Set up Go
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build and attach release binaries
+        if: ${{ steps.release.outputs.release_created }}
+        uses: goreleaser/goreleaser-action@v7
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
