@@ -39,6 +39,8 @@ type DisassemblyFunction struct {
 	Offset       int                      `json:"offset"`
 	Name         string                   `json:"name"`
 	Arguments    string                   `json:"arguments"`
+	Owner        string                   `json:"owner,omitempty"`
+	Path         string                   `json:"path,omitempty"`
 	Instructions []DisassemblyInstruction `json:"instructions"`
 }
 
@@ -74,15 +76,18 @@ func Disassemble(ctx context.Context, r io.Reader, opts DisassembleOptions) (*Di
 	for _, d := range doc.Diagnostics {
 		out.Diagnostics = append(out.Diagnostics, Diagnostic{Severity: SeverityWarning, Stage: StageParse, Offset: d.Offset, Function: -1, Message: d.Message})
 	}
-	for _, fn := range script.Functions {
+	appendFunction := func(fn *model.Function, owner, path string) error {
 		if err := ctx.Err(); err != nil {
-			return out, err
+			return err
 		}
 		decoded, decodeErr := bytecode.Decode(fn.Offset, fn.Code, opts.Strict)
 		if decodeErr != nil {
-			return out, decodeErr
+			return decodeErr
 		}
-		publicFn := DisassemblyFunction{Offset: fn.Offset, Name: displayValue(fn.Name), Arguments: displayValue(fn.Arguments)}
+		publicFn := DisassemblyFunction{
+			Offset: fn.Offset, Name: displayValue(fn.Name), Arguments: displayValue(fn.Arguments),
+			Owner: owner, Path: path,
+		}
 		for _, d := range decoded.Diagnostics {
 			opcode := fn.Code[d.Offset]
 			out.Diagnostics = append(out.Diagnostics, Diagnostic{Severity: SeverityWarning, Stage: StageDecode, Offset: int64(d.Offset), Function: fn.Offset, Opcode: &opcode, Message: d.Message})
@@ -104,6 +109,23 @@ func Disassemble(ctx context.Context, r io.Reader, opts DisassembleOptions) (*Di
 			publicFn.Instructions = append(publicFn.Instructions, item)
 		}
 		out.Functions = append(out.Functions, publicFn)
+		return nil
+	}
+	for _, fn := range script.Functions {
+		if err := appendFunction(fn, "", ""); err != nil {
+			return out, err
+		}
+	}
+	for _, actor := range script.Actors {
+		owner := displayValue(actor.Name)
+		if actor.Name == nil {
+			owner = actor.Path
+		}
+		for _, fn := range actor.Functions {
+			if err := appendFunction(fn, owner, fmt.Sprintf("%s[%d]", actor.Path, fn.Offset)); err != nil {
+				return out, err
+			}
+		}
 	}
 	return out, nil
 }
@@ -112,7 +134,14 @@ func (d *Disassembly) Text() string {
 	var b strings.Builder
 	fmt.Fprintf(&b, "FAS %s\n", d.Version)
 	for _, fn := range d.Functions {
-		fmt.Fprintf(&b, "\nfunction[%d] %s arguments=%s\n", fn.Offset, fn.Name, fn.Arguments)
+		fmt.Fprintf(&b, "\nfunction[%d] %s arguments=%s", fn.Offset, fn.Name, fn.Arguments)
+		if fn.Owner != "" {
+			fmt.Fprintf(&b, " owner=%s", fn.Owner)
+		}
+		if fn.Path != "" {
+			fmt.Fprintf(&b, " path=%s", fn.Path)
+		}
+		b.WriteByte('\n')
 		for _, inst := range fn.Instructions {
 			fmt.Fprintf(&b, "  %05x  %-12s %-24s", inst.Offset, inst.RawHex, inst.Mnemonic)
 			for i, operand := range inst.Operands {

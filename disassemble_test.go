@@ -21,6 +21,9 @@ func TestDemoDisassembly(t *testing.T) {
 		t.Fatal("no functions")
 	}
 	text := d.Text()
+	if strings.Contains(text, " owner=") || strings.Contains(text, " path=") {
+		t.Fatalf("ordinary root disassembly gained nested ownership metadata:\n%s", text)
+	}
 	for _, want := range []string{
 		"PushLiteral", "PushGlobal", "PopGlobal", "PushVariable", "PopVariable",
 		"PushParentVariable", "PositionalMessageSend", "MessageSend",
@@ -46,6 +49,22 @@ func TestDemoDisassembly(t *testing.T) {
 		}
 		if !found {
 			t.Errorf("function[%d] %q missing from stable demo shape", offset, name)
+		}
+	}
+}
+
+func TestNestedFunctionOwnershipText(t *testing.T) {
+	d := &Disassembly{
+		Version: "1.10",
+		Functions: []DisassemblyFunction{{
+			Offset: 8, Name: `"clicked_"`, Arguments: "nil",
+			Owner: `"AppDelegate"`, Path: "root[2].vector[4][8]",
+		}},
+	}
+	text := d.Text()
+	for _, want := range []string{`owner="AppDelegate"`, "path=root[2].vector[4][8]"} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("nested disassembly missing %q:\n%s", want, text)
 		}
 	}
 }

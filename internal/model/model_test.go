@@ -53,3 +53,62 @@ func TestNormalizeRejectsInvalidShapes(t *testing.T) {
 		t.Fatal("scalar script table accepted")
 	}
 }
+
+func TestNormalizeDiscoversNestedActorTable(t *testing.T) {
+	handlerName := &fas.Bytes{Data: []byte("clicked_")}
+	handler := &fas.Vector{HasType: true, Type: 16, Children: []fas.Value{
+		fas.NIL, handlerName, fas.NIL, fas.NIL, fas.NIL,
+		&fas.Vector{}, &fas.Vector{}, &fas.Bytes{Data: []byte{0x0f}},
+	}}
+	actor := &fas.Vector{}
+	wrapper := &fas.Vector{Children: []fas.Value{actor}}
+	actor.Children = []fas.Value{
+		fas.NIL,
+		&fas.Vector{Children: []fas.Value{&fas.Bytes{Data: []byte("object")}, handlerName}},
+		wrapper, handler,
+	}
+	actorName := &fas.Bytes{Data: []byte("AppDelegate")}
+	root := &fas.Vector{Children: []fas.Value{
+		fas.NIL,
+		&fas.Vector{Children: []fas.Value{actorName}},
+		&fas.Object{Value: actor},
+	}}
+	doc := &fas.Document{Root: &fas.Vector{Children: []fas.Value{root}}}
+
+	script, err := Normalize(doc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(script.Actors) != 1 {
+		t.Fatalf("actors = %d, want 1", len(script.Actors))
+	}
+	got := script.Actors[0]
+	if got.Name != actorName || got.RootOffset != 2 || got.Path != "root[2].object" {
+		t.Fatalf("actor identity = %#v", got)
+	}
+	if len(got.Functions) != 1 || got.Functions[0].Name != handlerName || got.Functions[0].Offset != 3 {
+		t.Fatalf("actor functions = %#v", got.Functions)
+	}
+}
+
+func TestActorDiscoveryRejectsUntypedNameVectorFalsePositive(t *testing.T) {
+	fake := &fas.Vector{Children: make([]fas.Value, 8)}
+	fake.Children[7] = &fas.Bytes{Data: []byte{0x0f}}
+	actor := &fas.Vector{Children: []fas.Value{
+		fas.NIL,
+		&fas.Vector{Children: []fas.Value{&fas.Bytes{Data: []byte("object")}, &fas.Bytes{Data: []byte("notAHandler")}}},
+		fas.NIL, fake,
+	}}
+	root := &fas.Vector{Children: []fas.Value{
+		fas.NIL,
+		&fas.Vector{Children: []fas.Value{&fas.Bytes{Data: []byte("candidate")}}},
+		actor,
+	}}
+	script, err := Normalize(&fas.Document{Root: &fas.Vector{Children: []fas.Value{root}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(script.Actors) != 0 {
+		t.Fatalf("false actor discovered: %#v", script.Actors)
+	}
+}

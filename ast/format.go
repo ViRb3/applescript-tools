@@ -43,6 +43,9 @@ func (f *Formatter) Script(script *Script) (string, error) {
 	if len(declarations) != 0 {
 		sections = append(sections, strings.Join(declarations, "\n"))
 	}
+	for _, object := range script.Objects {
+		sections = append(sections, f.scriptObject(object, 0))
+	}
 	for _, handler := range script.Handlers {
 		sections = append(sections, f.handler(handler, 0))
 	}

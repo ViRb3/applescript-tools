@@ -15,6 +15,9 @@ func (Strings) Name() string { return "strings" }
 
 func (Strings) Rewrite(script *ast.Script) (*ast.Script, []Diagnostic) {
 	rewriteStringsScope(script.Properties, script.Handlers, true)
+	for _, object := range script.Objects {
+		rewriteStringsScope(object.Properties, object.Handlers, true)
+	}
 	return script, nil
 }
 

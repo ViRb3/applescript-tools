@@ -75,6 +75,13 @@ func TestScriptObjectLayoutContract(t *testing.T) {
 	if got := contractFormatter(t).scriptObject(object, 0); got != want {
 		t.Fatalf("script object layout:\ngot:\n%s\nwant:\n%s", got, want)
 	}
+	scriptSource, err := contractFormatter(t).Script(&Script{Objects: []*ScriptObject{object}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if scriptSource != want+"\n" {
+		t.Fatalf("top-level script object layout:\ngot:\n%s\nwant:\n%s", scriptSource, want)
+	}
 }
 
 func TestRawEventHandlerRendering(t *testing.T) {

@@ -59,6 +59,43 @@ func TestArgumentAndFunctionNameRecovery(t *testing.T) {
 	}
 }
 
+func TestRunDecompilesDiscoveredActorTable(t *testing.T) {
+	actorName := &fas.Bytes{Data: []byte("AppDelegate")}
+	propertyName := &fas.Bytes{Data: []byte("ready")}
+	handlerName := &fas.Bytes{Data: []byte("clicked_")}
+	function := &model.Function{
+		Offset: 4, Name: handlerName, Arguments: fas.NIL,
+		Code: []byte{0x0f},
+	}
+	script := &model.Script{
+		Entries:   []fas.Value{fas.NIL, &fas.Vector{}, fas.NIL},
+		RootNames: []fas.Value{actorName},
+		Actors: []*model.Actor{{
+			Path: "root[2].vector[4]", RootOffset: 2, Name: actorName,
+			Names:     []fas.Value{&fas.Bytes{Data: []byte("object")}, propertyName, handlerName},
+			Entries:   []fas.Value{fas.NIL, &fas.Vector{}, fas.NIL, fas.SpecialFalse, function.Raw},
+			Functions: []*model.Function{function},
+		}},
+	}
+	result, err := Run(context.Background(), script, Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(result.Script.Properties) != 0 {
+		t.Fatalf("actor placeholder leaked into root properties: %#v", result.Script.Properties)
+	}
+	if len(result.Script.Objects) != 1 {
+		t.Fatalf("objects = %#v", result.Script.Objects)
+	}
+	object := result.Script.Objects[0]
+	if object.Name != "AppDelegate" || len(object.Properties) != 1 || object.Properties[0].Name != "ready" {
+		t.Fatalf("object = %#v", object)
+	}
+	if len(object.Handlers) != 1 || object.Handlers[0].Name != "clicked_" {
+		t.Fatalf("handlers = %#v", object.Handlers)
+	}
+}
+
 func TestEventHandlerParameterInference(t *testing.T) {
 	terms, err := terminology.Default()
 	if err != nil {

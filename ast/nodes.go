@@ -32,6 +32,7 @@ type Script struct {
 	Base
 	Uses       []Use
 	Properties []Property
+	Objects    []*ScriptObject
 	Handlers   []*Handler
 }
 
@@ -331,7 +332,7 @@ func (*Expression) isStmt() {}
 
 type Declaration struct {
 	Base
-	Names []string
+	Names  []string
 	Global bool
 }
 

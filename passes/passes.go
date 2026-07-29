@@ -32,6 +32,14 @@ func rewriteScript(script *ast.Script, rewrite func(ast.Expr) ast.Expr) {
 	for _, handler := range script.Handlers {
 		handler.Body = walkStatements(handler.Body, rewrite)
 	}
+	for _, object := range script.Objects {
+		for i := range object.Properties {
+			object.Properties[i].Value = walkExpr(object.Properties[i].Value, rewrite)
+		}
+		for _, handler := range object.Handlers {
+			handler.Body = walkStatements(handler.Body, rewrite)
+		}
+	}
 }
 
 func walkStatements(statements []ast.Stmt, rewrite func(ast.Expr) ast.Expr) []ast.Stmt {

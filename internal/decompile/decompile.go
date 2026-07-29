@@ -39,6 +39,12 @@ func Run(ctx context.Context, script *model.Script, opts Options) (*Result, erro
 	for i, value := range script.RootNames {
 		rootScope[i] = identifierValue(value, fmt.Sprintf("parent_var_%d", i))
 	}
+	for _, actor := range script.Actors {
+		if err := d.ctx.Err(); err != nil {
+			return &Result{Script: output, Diagnostics: d.diagnostics}, err
+		}
+		output.Objects = append(output.Objects, d.actorTable(actor, [][]string{rootScope}))
+	}
 	for _, function := range script.Functions {
 		handler, err := d.function(function, [][]string{rootScope})
 		if err != nil {
@@ -64,7 +70,14 @@ type decompiler struct {
 }
 
 func (d *decompiler) extractRoot() {
+	actorOffsets := make(map[int]bool, len(d.script.Actors))
+	for _, actor := range d.script.Actors {
+		actorOffsets[actor.RootOffset] = true
+	}
 	for offset := 2; offset < len(d.script.Entries); offset++ {
+		if actorOffsets[offset] {
+			continue
+		}
 		entry := d.script.Entries[offset]
 		if raw, ok := entry.(*fas.Vector); ok && len(raw.Children) >= 8 {
 			if _, ok := raw.Children[7].(*fas.Bytes); ok {
@@ -90,6 +103,47 @@ func (d *decompiler) extractRoot() {
 		}
 		d.output.Properties = append(d.output.Properties, ast.Property{Name: name, Value: value})
 	}
+}
+
+func (d *decompiler) actorTable(actor *model.Actor, parentScopes [][]string) *ast.ScriptObject {
+	name := identifierValue(actor.Name, "scriptObject")
+	object := &ast.ScriptObject{Name: name}
+	functionOffsets := make(map[int]bool, len(actor.Functions))
+	for _, function := range actor.Functions {
+		functionOffsets[function.Offset] = true
+	}
+	for offset := 2; offset < len(actor.Entries); offset++ {
+		if functionOffsets[offset] {
+			continue
+		}
+		index := offset - 2
+		if index >= len(actor.Names) {
+			continue
+		}
+		propertyName := identifierValue(actor.Names[index], "")
+		if propertyName == "" || propertyName == "object" {
+			continue
+		}
+		object.Properties = append(object.Properties, ast.Property{
+			Name: propertyName, Value: d.rootInitializer(actor.Entries[offset]),
+		})
+	}
+	actorScope := make([]string, len(actor.Names))
+	for i, value := range actor.Names {
+		actorScope[i] = identifierValue(value, fmt.Sprintf("var_%d", i))
+	}
+	scopes := append([][]string{actorScope}, parentScopes...)
+	for _, function := range actor.Functions {
+		handler, err := d.function(function, scopes)
+		if err != nil {
+			d.diagnostics = append(d.diagnostics, Diagnostic{Function: function.Offset, Offset: -1, Message: fmt.Sprintf("%s: %v", actor.Path, err)})
+			continue
+		}
+		if handler != nil {
+			object.Handlers = append(object.Handlers, handler)
+		}
+	}
+	return object
 }
 
 func (d *decompiler) rootInitializer(entry fas.Value) ast.Expr {
