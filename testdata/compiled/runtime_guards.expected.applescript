@@ -1,0 +1,21 @@
+on run
+    set literal00 to "value00"
+    set literal01 to "value01"
+    set literal02 to "value02"
+    set literal03 to "value03"
+    set literal04 to "value04"
+    set literal05 to "value05"
+    set literal06 to "value06"
+    set literal07 to "value07"
+    set literal08 to "value08"
+    set literal09 to "value09"
+    set literal10 to "value10"
+    set literal11 to "value11"
+    set literal12 to "value12"
+    set literal13 to "value13"
+    set literal14 to "value14"
+    set literal15 to "value15"
+    set literal16 to "value16"
+    set literal17 to "value17"
+    return {literal17, «data TEST0102»}
+end run
