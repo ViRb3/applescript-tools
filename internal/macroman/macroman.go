@@ -1,7 +1,5 @@
-// Package macroman converts between Mac OS Roman bytes and Unicode.
 package macroman
 
-// Decode converts Mac OS Roman bytes to a UTF-8 string.
 func Decode(data []byte) string {
 	decoded := make([]rune, len(data))
 	for i, b := range data {
@@ -10,7 +8,6 @@ func Decode(data []byte) string {
 	return string(decoded)
 }
 
-// DecodeByte converts one Mac OS Roman byte to its Unicode code point.
 func DecodeByte(value byte) rune {
 	if value < 0x80 {
 		return rune(value)
@@ -18,7 +15,6 @@ func DecodeByte(value byte) rune {
 	return decodeTable[value-0x80]
 }
 
-// EncodeRune converts a Unicode code point to one Mac OS Roman byte.
 func EncodeRune(character rune) (byte, bool) {
 	if character <= 0x7f {
 		return byte(character), true
@@ -27,8 +23,6 @@ func EncodeRune(character rune) (byte, bool) {
 	return value, ok
 }
 
-// decodeTable is the single source of truth for the Mac OS Roman repertoire.
-// encodeTable is derived from it below so the two directions cannot drift.
 var decodeTable = [128]rune{
 	0x00c4, 0x00c5, 0x00c7, 0x00c9, 0x00d1, 0x00d6, 0x00dc, 0x00e1, 0x00e0, 0x00e2, 0x00e4, 0x00e3, 0x00e5, 0x00e7, 0x00e9, 0x00e8,
 	0x00ea, 0x00eb, 0x00ed, 0x00ec, 0x00ee, 0x00ef, 0x00f1, 0x00f3, 0x00f2, 0x00f4, 0x00f6, 0x00f5, 0x00fa, 0x00f9, 0x00fb, 0x00fc,
