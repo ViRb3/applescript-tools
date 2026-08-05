@@ -124,11 +124,30 @@ func TestAliasNameContracts(t *testing.T) {
 	descriptor[7] = 2
 	descriptor[50] = byte(len("System Settings.app"))
 	copy(descriptor[51:], "System Settings.app")
-	if got := aliasName(descriptor); got != "System Preferences" {
+	if got, ok := aliasName(descriptor); !ok || got != "System Preferences" {
 		t.Fatalf("alias name = %q", got)
 	}
-	if got := aliasName([]byte("Disk:Folder:Extensionless")); got != "Extensionless" {
-		t.Fatalf("extensionless alias = %q", got)
+	if got, ok := aliasName([]byte("Disk:Folder:Extensionless")); ok || got != "" {
+		t.Fatalf("malformed alias = %q, %v", got, ok)
+	}
+}
+
+func TestOnlyValidatedAliasDescriptorsBecomeApplications(t *testing.T) {
+	content := make([]byte, 80)
+	content[7] = 2
+	content[50] = byte(len("Finder.app"))
+	copy(content[51:], "Finder.app")
+	application, ok := literal(&fas.Descriptor{Type: [4]byte{'a', 'l', 'i', 's'}, Content: content}).(*ast.Application)
+	if !ok || application.Name != "Finder" {
+		t.Fatalf("validated alias = %#v", application)
+	}
+	raw, ok := literal(&fas.Descriptor{Type: [4]byte{'b', 'o', 'o', 'k'}, Content: content}).(*ast.RawDataLiteral)
+	if !ok || string(raw.Type[:]) != "book" {
+		t.Fatalf("non-alias descriptor = %#v", raw)
+	}
+	content[7] = 1
+	if _, ok := literal(&fas.Descriptor{Type: [4]byte{'a', 'l', 'i', 's'}, Content: content}).(*ast.Application); ok {
+		t.Fatal("malformed alias descriptor became an application target")
 	}
 }
 

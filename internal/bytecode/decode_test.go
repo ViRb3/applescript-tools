@@ -117,3 +117,32 @@ func TestEveryOperandFamily(t *testing.T) {
 		}
 	}
 }
+
+func TestFrameworkVerifiedWordOperands(t *testing.T) {
+	tests := []struct {
+		opcode byte
+		kind   OperandKind
+		value  int
+	}{
+		{16, OperandLiteralIndex, 0x123},  // Continue
+		{74, OperandLiteralIndex, 0x123},  // PositionalContinue
+		{77, OperandLiteralIndex, 0x123},  // DefineClosure
+		{78, OperandLiteralIndex, 0x123},  // DefineProperty
+		{82, OperandBranchTarget, 0x124},  // Of
+		{112, OperandBranchTarget, 0x124}, // BeginTransaction
+		{117, OperandLiteralIndex, 0x123}, // MatchLiteral
+	}
+	for _, test := range tests {
+		decoded, err := Decode(0, []byte{test.opcode, 0x01, 0x23, 0x0f}, true)
+		if err != nil {
+			t.Fatalf("opcode %#x: %v", test.opcode, err)
+		}
+		if len(decoded.Instructions) != 2 || len(decoded.Instructions[0].Raw) != 3 {
+			t.Fatalf("opcode %#x instruction boundaries = %#v", test.opcode, decoded.Instructions)
+		}
+		operand := decoded.Instructions[0].Operands[0]
+		if operand.Kind != test.kind || operand.Value != test.value {
+			t.Errorf("opcode %#x operand = %#v, want %s=%d", test.opcode, operand, test.kind, test.value)
+		}
+	}
+}

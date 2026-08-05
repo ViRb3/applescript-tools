@@ -234,14 +234,18 @@ const (
 	blockTell
 	blockConsider
 	blockTimeout
+	blockTransaction
+	blockOf
 )
 
 type block struct {
-	kind   blockKind
-	node   ast.Stmt
-	elseAt int
-	endAt  int
-	inElse bool
+	kind      blockKind
+	node      ast.Stmt
+	elseAt    int
+	endAt     int
+	inElse    bool
+	container ast.Expr
+	stackBase int
 }
 
 type state struct {
@@ -256,6 +260,7 @@ type state struct {
 	variables    []string
 	parentScopes [][]string
 	logic        []logicState
+	undefined    int
 	underflow    bool
 }
 type logicState struct {
@@ -284,7 +289,17 @@ func (d *decompiler) function(fn *model.Function, parentScopes [][]string) (*ast
 	name, event, isRun := functionName(fn.Name, d.opts.Terms)
 	handler := &ast.Handler{Name: name, EventCode: event, IsRunHandler: isRun}
 	if event != nil && !isRun {
-		handler.Parameters = inferEventParameters(*event, variables, d.opts.Terms)
+		if d.opts.Terms != nil {
+			_, known := d.opts.Terms.Command(*event)
+			if known {
+				var complete bool
+				handler.Parameters, complete = inferEventParameters(*event, variables, d.opts.Terms)
+				if !complete {
+					handler.UnresolvedParameters = true
+					d.diagnostics = append(d.diagnostics, Diagnostic{Function: fn.Offset, Offset: -1, Message: "event parameter mapping is ambiguous"})
+				}
+			}
+		}
 	}
 	if len(handler.Parameters) == 0 {
 		for i := range args {
@@ -335,13 +350,13 @@ func (d *decompiler) function(fn *model.Function, parentScopes [][]string) (*ast
 // variable. Named parameters are matched by meaningful words from their SDEF
 // names, which mirrors how the compiler derives conventional variable names
 // such as "theRule" from "for rule".
-func inferEventParameters(event terminology.EventCode, variables []string, terms *terminology.Registry) []ast.Parameter {
+func inferEventParameters(event terminology.EventCode, variables []string, terms *terminology.Registry) ([]ast.Parameter, bool) {
 	if terms == nil {
-		return nil
+		return nil, false
 	}
 	command, ok := terms.Command(event)
 	if !ok {
-		return nil
+		return nil, false
 	}
 	remaining := append([]string(nil), variables...)
 	var parameters []ast.Parameter
@@ -350,37 +365,41 @@ func inferEventParameters(event terminology.EventCode, variables []string, terms
 		remaining = remaining[1:]
 	}
 
-	codes := make([]terminology.Code4, 0, len(command.Parameters))
-	for code := range command.Parameters {
-		codes = append(codes, code)
+	codes := append([]terminology.Code4(nil), command.ParameterOrder...)
+	if len(codes) == 0 && len(command.Parameters) != 0 {
+		for code := range command.Parameters {
+			codes = append(codes, code)
+		}
+		sort.Slice(codes, func(i, j int) bool { return string(codes[i][:]) < string(codes[j][:]) })
 	}
-	sort.Slice(codes, func(i, j int) bool {
-		return string(codes[i][:]) < string(codes[j][:])
-	})
 	for _, code := range codes {
 		parameter := command.Parameters[code]
 		words := meaningfulParameterWords(parameter.Name)
-		match := -1
+		matches := make([]int, 0, 1)
 		for i, variable := range remaining {
 			lower := strings.ToLower(variable)
 			for _, word := range words {
 				if strings.Contains(lower, word) {
-					match = i
+					matches = append(matches, i)
 					break
 				}
 			}
-			if match >= 0 {
-				break
-			}
 		}
-		if match < 0 {
+		if len(matches) == 0 && len(codes) == 1 && len(remaining) == 1 {
+			matches = append(matches, 0)
+		}
+		if len(matches) > 1 {
+			return parameters, false
+		}
+		if len(matches) == 0 {
 			continue
 		}
+		match := matches[0]
 		codeCopy := code
 		parameters = append(parameters, ast.Parameter{Name: remaining[match], Code: &codeCopy})
 		remaining = append(remaining[:match], remaining[match+1:]...)
 	}
-	return parameters
+	return parameters, true
 }
 
 func meaningfulParameterWords(name string) []string {
@@ -468,11 +487,25 @@ func (s *state) emit(statement ast.Stmt) {
 	case blockTimeout:
 		node := current.node.(*ast.Timeout)
 		node.Body = append(node.Body, statement)
+	case blockTransaction:
+		node := current.node.(*ast.Transaction)
+		node.Body = append(node.Body, statement)
+	case blockOf:
+		// Of/EndOf scopes an expression, not a source statement block.
 	}
 }
 func (s *state) closeTop() {
 	b := s.blocks[len(s.blocks)-1]
 	s.blocks = s.blocks[:len(s.blocks)-1]
+	if b.kind == blockOf {
+		value := ast.Expr(&ast.MissingLiteral{})
+		if len(s.stack) > b.stackBase {
+			value = s.pop()
+			s.stack = s.stack[:b.stackBase]
+		}
+		s.push(&ast.Binary{Op: ast.Of, Left: value, Right: b.container})
+		return
+	}
 	if b.kind == blockTry {
 		annotateExtendedErrorBindings(b.node.(*ast.Try))
 	}
@@ -632,6 +665,12 @@ func (s *state) literal(index int) ast.Expr {
 	if !ok {
 		return &ast.Variable{Name: fmt.Sprintf("literal_%d", index)}
 	}
+	if opaque, ok := value.(*fas.TypedData); ok {
+		s.d.diagnostics = append(s.d.diagnostics, Diagnostic{
+			Function: s.fn.Offset, Offset: -1,
+			Message: fmt.Sprintf("unresolved runtime data type %d", opaque.Type),
+		})
+	}
 	return literal(value)
 }
 
@@ -662,7 +701,7 @@ func (s *state) instruction(inst bytecode.Instruction) error {
 	case op == "PushMe":
 		s.push(&ast.Me{})
 	case op == "PushUndefined":
-		// The compiler uses this as VM bookkeeping; it has no source value.
+		s.undefined++
 	case op == "PushVariable" || op == "PushVariableExtended":
 		s.push(&ast.Variable{Name: s.variable(s.operand(inst, 0))})
 	case op == "PopVariable" || op == "PopVariableExtended":
@@ -684,7 +723,9 @@ func (s *state) instruction(inst bytecode.Instruction) error {
 			s.stack[len(s.stack)-1], s.stack[len(s.stack)-2] = s.stack[len(s.stack)-2], s.stack[len(s.stack)-1]
 		}
 	case op == "Pop":
-		if s.previous != "PushUndefined" && len(s.stack) > 0 {
+		if s.previous == "PushUndefined" && s.undefined > 0 {
+			s.undefined--
+		} else if len(s.stack) > 0 {
 			s.pop()
 		}
 	case binaryOps[op] != "":
@@ -787,6 +828,14 @@ func (s *state) instruction(inst bytecode.Instruction) error {
 		if b := s.current(blockTimeout); b != nil {
 			s.closeThrough(b)
 		}
+	case op == "BeginTransaction":
+		node := &ast.Transaction{}
+		s.blocks = append(s.blocks, &block{kind: blockTransaction, node: node, endAt: s.operand(inst, 0)})
+	case op == "EndTransaction":
+		if b := s.current(blockTransaction); b != nil {
+			s.flushPendingExpression()
+			s.closeThrough(b)
+		}
 	case op == "ErrorHandler":
 		node := &ast.Try{}
 		s.blocks = append(s.blocks, &block{kind: blockTry, node: node, elseAt: s.operand(inst, 0)})
@@ -859,6 +908,9 @@ func (s *state) instruction(inst bytecode.Instruction) error {
 		s.emit(&ast.Copy{Source: source, Target: target})
 	case op == "StoreResult":
 		if len(s.stack) == 0 {
+			if s.undefined > 0 {
+				s.undefined--
+			}
 			break
 		}
 		value := s.pop()
@@ -902,14 +954,33 @@ func (s *state) instruction(inst bytecode.Instruction) error {
 			s.pop()
 		}
 		args := []ast.Argument{ast.DirectArgument{Value: message}}
-		args = append(args, typedArguments(values, s.d.opts.Terms, terminology.EventCode{})...)
+		args = append(args, typedArguments(values, s.d.opts.Terms, terminology.EventCode{}, "")...)
 		s.emit(&ast.Expression{Value: &ast.CommandCall{Name: "error", Arguments: args}})
 	case op == "ObjectAliasQuote":
 		s.push(&ast.CopyExpr{Value: s.pop()})
 	case op == "Of":
-		right, left := s.pop(), s.pop()
-		s.push(&ast.Binary{Op: ast.Of, Left: left, Right: right})
-	case op == "GetData" || op == "GetResult" || op == "EndDefineActor" || op == "DefineProcedure" || op == "DefineProperty" || op == "Continue" || op == "PositionalContinue":
+		container := s.pop()
+		s.blocks = append(s.blocks, &block{kind: blockOf, container: container, stackBase: len(s.stack), endAt: s.operand(inst, 0)})
+	case op == "EndOf":
+		if b := s.current(blockOf); b != nil {
+			value := s.pop()
+			for len(s.blocks) > 1 && s.blocks[len(s.blocks)-1] != b {
+				s.closeTop()
+			}
+			if len(s.blocks) > 1 {
+				s.blocks = s.blocks[:len(s.blocks)-1]
+			}
+			if len(s.stack) > b.stackBase {
+				s.stack = s.stack[:b.stackBase]
+			}
+			s.push(&ast.Binary{Op: ast.Of, Left: value, Right: b.container})
+		}
+	case op == "PushNext":
+		// Continue bytecode carries a runtime next-handler value. The source
+		// call is reconstructed by the following Continue opcode.
+	case op == "Continue" || op == "PositionalContinue":
+		s.continueCall(s.operand(inst, 0), op == "PositionalContinue")
+	case op == "GetData" || op == "GetResult" || op == "EndDefineActor" || op == "DefineProcedure" || op == "DefineClosure" || op == "DefineProperty" || op == "MatchLiteral":
 	default:
 		return fmt.Errorf("unsupported opcode %s (0x%02x)", op, byte(inst.Opcode))
 	}
@@ -1112,6 +1183,14 @@ func (s *state) makeSpecifier(sub byte) {
 		s.push(&ast.Specifier{Kind: ast.PropertySpecifier, Object: object, Container: container})
 	case 22:
 		object, container := s.pop(), s.pop()
+		if keyword, ok := object.(*ast.Keyword); ok && string(keyword.Code) == "prop" {
+			// AppleScript's compiler serializes the special plural `properties`
+			// as every `prop`; osadecompile canonicalizes that representation back
+			// to `properties of ...`.
+			object = &ast.Keyword{Code: keyword.Code, Fallback: "properties"}
+			s.push(&ast.Specifier{Kind: ast.PropertySpecifier, Object: object, Container: container})
+			return
+		}
 		s.push(&ast.Specifier{Kind: ast.EverySpecifier, Object: object, Container: container})
 	case 23:
 		object, container := s.pop(), s.pop()
@@ -1219,7 +1298,55 @@ func (s *state) message(index int, positional bool) {
 			name = command.Name
 		}
 	}
-	s.push(&ast.CommandCall{Code: code, Name: name, Arguments: typedArguments(values, s.d.opts.Terms, code)})
+	if rawName == "path" && hasKeyword(values, "to  ") {
+		name = "path to"
+	}
+	s.push(&ast.CommandCall{Code: code, Name: name, Arguments: typedArguments(values, s.d.opts.Terms, code, rawName)})
+}
+
+func hasKeyword(values []ast.Expr, code string) bool {
+	for _, value := range values {
+		if keyword, ok := value.(*ast.Keyword); ok && string(keyword.Code) == code {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *state) continueCall(index int, positional bool) {
+	if !positional {
+		count := len(s.handler.Parameters)
+		if count == 0 {
+			count = len(recoverArgs(s.fn.Arguments))
+		}
+		values := s.popMany(count)
+		if len(s.stack) > 0 {
+			if _, ok := s.stack[len(s.stack)-1].(*ast.NumberLiteral); ok {
+				s.pop() // compiler next-handler slot
+			}
+		}
+		if len(s.stack) > 0 {
+			s.pop() // current receiver (normally me)
+		}
+		s.push(&ast.It{})
+		for _, value := range values {
+			s.push(value)
+		}
+		s.push(&ast.NumberLiteral{Integer: int64(len(values))})
+	}
+	if len(s.stack) > 0 {
+		if _, ok := s.stack[len(s.stack)-1].(*ast.It); ok {
+			s.pop()
+		}
+	}
+	s.message(index, positional)
+	call := s.pop()
+	if handler, ok := call.(*ast.HandlerCall); ok {
+		if _, isMe := handler.Target.(*ast.Me); isMe {
+			handler.Target = nil
+		}
+	}
+	s.emit(&ast.Continue{Call: call})
 }
 
 func eventCodeFromValue(value fas.Value, code *terminology.EventCode) bool {
@@ -1250,7 +1377,7 @@ func eventCodeFromValue(value fas.Value, code *terminology.EventCode) bool {
 	return false
 }
 
-func typedArguments(values []ast.Expr, terms *terminology.Registry, event terminology.EventCode) []ast.Argument {
+func typedArguments(values []ast.Expr, terms *terminology.Registry, event terminology.EventCode, rawName string) []ast.Argument {
 	var output []ast.Argument
 	var command terminology.Command
 	if terms != nil {
@@ -1261,6 +1388,13 @@ func typedArguments(values []ast.Expr, terms *terminology.Registry, event termin
 		if ok && len(keyword.Code) == 4 && index+1 < len(values) {
 			var code terminology.Code4
 			copy(code[:], keyword.Code)
+			// The compiler uses the internal keyword "to  " to delimit the
+			// direct argument of commands such as Standard Additions' “path to”.
+			if string(code[:]) == "to  " && (command.HasDirectParameter || rawName == "path") {
+				output = append(output, ast.DirectArgument{Value: values[index+1]})
+				index++
+				continue
+			}
 			name := ""
 			parameter, known := command.Parameters[code]
 			if known {

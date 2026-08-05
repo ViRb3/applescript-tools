@@ -52,11 +52,12 @@ type Property struct {
 
 type Handler struct {
 	Base
-	Name         string
-	EventCode    *terminology.EventCode
-	Parameters   []Parameter
-	Body         []Stmt
-	IsRunHandler bool
+	Name                 string
+	EventCode            *terminology.EventCode
+	Parameters           []Parameter
+	Body                 []Stmt
+	IsRunHandler         bool
+	UnresolvedParameters bool
 }
 
 type Parameter struct {
@@ -105,6 +106,16 @@ type RawDataLiteral struct {
 }
 
 func (*RawDataLiteral) isExpr() {}
+
+// OpaqueLiteral retains a runtime class and payload whose source semantics are
+// not known. It is deliberately rendered as an explicit unsupported form.
+type OpaqueLiteral struct {
+	Base
+	RuntimeType byte
+	Data        []byte
+}
+
+func (*OpaqueLiteral) isExpr() {}
 
 type Keyword struct {
 	Base
@@ -400,6 +411,20 @@ type Timeout struct {
 }
 
 func (*Timeout) isStmt() {}
+
+type Transaction struct {
+	Base
+	Body []Stmt
+}
+
+func (*Transaction) isStmt() {}
+
+type Continue struct {
+	Base
+	Call Expr
+}
+
+func (*Continue) isStmt() {}
 
 type Return struct {
 	Base

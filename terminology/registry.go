@@ -70,6 +70,7 @@ type Command struct {
 	Code               EventCode
 	Name               string
 	Parameters         map[Code4]Parameter
+	ParameterOrder     []Code4
 	HasDirectParameter bool
 }
 
@@ -162,6 +163,7 @@ func ParseSDEF(name string, input io.Reader) (*Dictionary, error) {
 							return err
 						}
 						command.Parameters[parameterCode] = Parameter{Code: parameterCode, Name: parameterName, Type: child.attr("type")}
+						command.ParameterOrder = append(command.ParameterOrder, parameterCode)
 					}
 				}
 				d.Commands[code] = command

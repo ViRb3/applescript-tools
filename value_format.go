@@ -39,6 +39,8 @@ func displayValue(v fas.Value) string {
 		return displayValue(v.Value)
 	case *fas.RawData:
 		return fmt.Sprintf("data[%d](%s)", len(v.Data), previewHex(v.Data))
+	case *fas.TypedData:
+		return fmt.Sprintf("typed-data[%d](%s)", v.Type, previewHex(v.Data))
 	case *fas.Descriptor:
 		return fmt.Sprintf("descriptor(%q,%s)", v.Type, previewHex(v.Content))
 	case *fas.EventIdentifier:

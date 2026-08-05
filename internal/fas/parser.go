@@ -75,6 +75,8 @@ type parser struct {
 	diagnostics []Diagnostic
 }
 
+const frameworkRefErrorLimit = 6
+
 func Parse(r io.Reader, opts Options) (*Document, error) {
 	defaults := DefaultLimits()
 	if opts.Limits.MaxInputBytes <= 0 {
@@ -264,10 +266,9 @@ func (p *parser) loadObject(expected int16) (Value, error) {
 		p.diagnostics = append(p.diagnostics, Diagnostic{Offset: h.offset, Message: msg})
 		p.reuse = &h
 		p.refErrors++
-		// A damaged reference vector can omit many IDs before it reaches the
-		// intact object held in reuse. Keep recovery bounded by the caller's
-		// reference limit instead of an unrelated small mismatch count.
-		if p.opts.Strict || p.refErrors >= p.opts.Limits.MaxReferences {
+		// The framework reuses the mismatched header and substitutes NIL, but
+		// aborts after the sixth mismatch.
+		if p.opts.Strict || p.refErrors >= frameworkRefErrorLimit {
 			return nil, errors.New(msg)
 		}
 		return NIL, nil
@@ -321,14 +322,10 @@ func (p *parser) loadBody(ref int16, index byte, size uint16) (Value, error) {
 	}
 	switch index {
 	case 1:
-		if size == 0 {
-			return NIL, nil
+		if size != 0 {
+			return nil, errors.New("nil object size must be zero")
 		}
-		n, err := p.u64()
-		if err != nil {
-			return nil, err
-		}
-		return &Symbol{Number: n}, nil
+		return NIL, nil
 	case 2:
 		return p.loadList(size)
 	case 3:
@@ -354,9 +351,9 @@ func (p *parser) loadBody(ref int16, index byte, size uint16) (Value, error) {
 	case 10:
 		return p.loadCodeIdentifier(size)
 	case 11:
-		return p.loadUserIdentifier()
+		return p.loadUserIdentifier(size)
 	case 12:
-		return p.loadUnicodeText()
+		return p.loadUnicodeText(size)
 	case 13:
 		return p.loadStatement(ref, size)
 	case 15:
@@ -441,8 +438,11 @@ func (p *parser) loadValueBlock(ref int16, size uint16) (Value, error) {
 }
 
 func (p *parser) loadList(size uint16) (Value, error) {
-	if size != 2 {
+	if size == 0 {
 		return &Pair{Empty: true}, nil
+	}
+	if size != 2 {
+		return nil, fmt.Errorf("unknown FAS list type %d", size)
 	}
 	head := &Pair{Head: NIL, Tail: &Pair{Empty: true}}
 	cur := head
@@ -494,7 +494,7 @@ func (p *parser) loadList(size uint16) (Value, error) {
 }
 
 func (p *parser) loadRecord(ref int16, size uint16) (Value, error) {
-	if size == 1 {
+	if size == 0 {
 		return &Binding{Empty: true}, nil
 	}
 	if size != 3 {
@@ -592,7 +592,7 @@ func (p *parser) loadCodeIdentifier(size uint16) (Value, error) {
 	}
 }
 
-func (p *parser) loadUserIdentifier() (Value, error) {
+func (p *parser) loadUserIdentifier(size uint16) (Value, error) {
 	tag, err := p.u8()
 	if err != nil {
 		return nil, err
@@ -625,10 +625,13 @@ func (p *parser) loadUserIdentifier() (Value, error) {
 	if b == 0 {
 		value = key
 	}
+	if uint32(a)+uint32(b)+4 != uint32(size) {
+		return nil, fmt.Errorf("user identifier payload size %d, want %d", uint32(a)+uint32(b)+4, size)
+	}
 	return &Bytes{Data: value}, nil
 }
 
-func (p *parser) loadUnicodeText() (Value, error) {
+func (p *parser) loadUnicodeText(size uint16) (Value, error) {
 	n, err := p.u16()
 	if err != nil {
 		return nil, err
@@ -644,6 +647,16 @@ func (p *parser) loadUnicodeText() (Value, error) {
 	style, err := p.readN(int(s))
 	if err != nil {
 		return nil, err
+	}
+	if uint32(n)+uint32(s)+4 != uint32(size) {
+		return nil, fmt.Errorf("Unicode text payload size %d, want %d", uint32(n)+uint32(s)+4, size)
+	}
+	if len(style) < 2 {
+		return nil, errors.New("Unicode text style table is truncated")
+	}
+	styleCount := int(binary.BigEndian.Uint16(style[:2]))
+	if want := 2 + 20*styleCount; len(style) != want {
+		return nil, fmt.Errorf("Unicode text style table size %d, want %d", len(style), want)
 	}
 	return &Object{Value: &UnicodeText{Text: text, Style: style}}, nil
 }
@@ -765,6 +778,6 @@ func runtimeValue(tag byte, b []byte) (Value, error) {
 	case 0xb1:
 		return &UnicodeText{Text: b}, nil
 	default:
-		return nil, fmt.Errorf("unknown runtime value type %d", tag)
+		return &TypedData{Type: tag, Data: append([]byte(nil), b...)}, nil
 	}
 }

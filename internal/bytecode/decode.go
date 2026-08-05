@@ -16,6 +16,37 @@ type Function struct {
 	Diagnostics  []Diagnostic
 }
 
+type operandEncoding uint8
+
+const (
+	encodeNone operandEncoding = iota
+	encodeLiteral
+	encodeVariable
+	encodeParentVariable
+	encodeErrorBindings
+	encodeBranch
+	encodeSignedWord
+)
+
+var operandEncodings = func() [256]operandEncoding {
+	var out [256]operandEncoding
+	for _, opcode := range []byte{12, 16, 43, 74, 75, 76, 77, 78, 95, 96, 97, 117} {
+		out[opcode] = encodeLiteral
+	}
+	for _, opcode := range []byte{27, 28, 93, 94} {
+		out[opcode] = encodeVariable
+	}
+	for _, opcode := range []byte{98, 99} {
+		out[opcode] = encodeParentVariable
+	}
+	out[88] = encodeErrorBindings
+	for _, opcode := range []byte{9, 10, 19, 20, 23, 29, 82, 87, 89, 112} {
+		out[opcode] = encodeBranch
+	}
+	out[18] = encodeSignedWord
+	return out
+}()
+
 func Decode(functionOffset int, code []byte, strict bool) (*Function, error) {
 	out := &Function{Offset: functionOffset}
 	for pc := 0; pc < len(code); {
@@ -42,34 +73,30 @@ func Decode(functionOffset int, code []byte, strict bool) (*Function, error) {
 			return nil
 		}
 		var err error
-		switch inst.Mnemonic {
-		case "PushLiteral":
+		switch {
+		case rawOpcode >= 224:
 			inst.Operands = append(inst.Operands, Operand{Kind: OperandLiteralIndex, Value: int(rawOpcode & 0x0f)})
-		case "PushVariable", "PopVariable":
+		case rawOpcode >= 160 && rawOpcode <= 191:
 			inst.Operands = append(inst.Operands, Operand{Kind: OperandVariableIndex, Value: int(rawOpcode & 0x0f)})
-		case "PushGlobal", "PopGlobal":
+		case rawOpcode >= 192 && rawOpcode <= 223:
 			inst.Operands = append(inst.Operands, Operand{Kind: OperandLiteralIndex, Value: int(rawOpcode & 0x0f)})
-		case "PushLiteralExtended", "PushGlobalExtended", "PopGlobalExtended", "MessageSend", "PositionalMessageSend", "DefineActor":
+		case operandEncodings[rawOpcode] == encodeLiteral:
 			_, err = word(OperandLiteralIndex)
-		case "PushVariableExtended", "PopVariableExtended", "RepeatInCollection", "RepeatInRange":
+		case operandEncodings[rawOpcode] == encodeVariable:
 			_, err = word(OperandVariableIndex)
-		case "PushParentVariable", "PopParentVariable":
+		case operandEncodings[rawOpcode] == encodeParentVariable:
 			_, err = word(OperandParentDepth)
 			if err == nil {
 				_, err = word(OperandVariableIndex)
 			}
-		case "HandleError":
+		case operandEncodings[rawOpcode] == encodeErrorBindings:
 			_, err = word(OperandLiteralIndex)
 			if err == nil {
 				_, err = word(OperandLiteralIndex)
 			}
-		case "Jump", "And", "Or", "TestIf", "Consider", "ErrorHandler", "EndErrorHandler":
+		case operandEncodings[rawOpcode] == encodeBranch:
 			err = branch(pc)
-		case "Tell":
-			_, err = word(OperandSignedWord)
-		case "LinkRepeat":
-			err = branch(start + 1)
-		case "DefineProcedure":
+		case operandEncodings[rawOpcode] == encodeSignedWord:
 			_, err = word(OperandSignedWord)
 		}
 		if err != nil {

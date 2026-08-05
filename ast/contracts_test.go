@@ -105,6 +105,31 @@ func TestRawEventHandlerRendering(t *testing.T) {
 	}
 }
 
+func TestAmbiguousEventHandlerRenderingIsExplicit(t *testing.T) {
+	event, _ := terminology.ParseEventCode("testhand")
+	handler := &Handler{
+		Name: "handle", EventCode: &event, UnresolvedParameters: true,
+		Body: []Stmt{&Return{Explicit: true}},
+	}
+	got := contractFormatter(t).handler(handler, 0)
+	if !strings.Contains(got, "on «event testhand» «unresolved parameters»") {
+		t.Fatalf("ambiguous handler was rendered as ordinary source:\n%s", got)
+	}
+}
+
+func TestKnownDirectEventUsesEventHandlerSyntax(t *testing.T) {
+	event, _ := terminology.ParseEventCode("aevtodoc")
+	handler := &Handler{
+		Name: "open", EventCode: &event,
+		Parameters: []Parameter{{Name: "dropped_items"}},
+		Body:       []Stmt{&Return{Explicit: true}},
+	}
+	want := "on open dropped_items\n    return\nend open"
+	if got := contractFormatter(t).handler(handler, 0); got != want {
+		t.Fatalf("event handler = %q, want %q", got, want)
+	}
+}
+
 func TestEveryRepeatHeader(t *testing.T) {
 	f := contractFormatter(t)
 	cases := []struct {
@@ -123,6 +148,20 @@ func TestEveryRepeatHeader(t *testing.T) {
 		if got := f.stmt(test.node, 0); got != test.want {
 			t.Errorf("repeat = %q, want %q", got, test.want)
 		}
+	}
+}
+
+func TestTransactionContinueAndOpaqueRendering(t *testing.T) {
+	f := contractFormatter(t)
+	transaction := &Transaction{Body: []Stmt{&Continue{Call: &HandlerCall{
+		Name: "nextHandler", Arguments: []Expr{&NumberLiteral{Integer: 7}},
+	}}}}
+	want := "with transaction\n    continue nextHandler(7)\nend transaction"
+	if got := f.stmt(transaction, 0); got != want {
+		t.Fatalf("transaction = %q, want %q", got, want)
+	}
+	if got := f.expr(&OpaqueLiteral{RuntimeType: 254, Data: []byte{0xaa, 0xbb}}, 0); got != "«unsupported runtime data type 254: aabb»" {
+		t.Fatalf("opaque literal = %q", got)
 	}
 }
 

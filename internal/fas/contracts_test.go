@@ -34,9 +34,8 @@ func TestPrimitiveObjectContracts(t *testing.T) {
 			t.Fatalf("zero symbol = %#v, %v", value, err)
 		}
 		p = contractParser([]byte{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88})
-		value, err := p.loadBody(-1, 1, 8)
-		if err != nil || value.(*Symbol).Number != 0x1122334455667788 {
-			t.Fatalf("symbol = %#v, %v", value, err)
+		if _, err := p.loadBody(-1, 1, 8); err == nil || !strings.Contains(err.Error(), "must be zero") {
+			t.Fatalf("non-nil object error = %v", err)
 		}
 	})
 
@@ -67,7 +66,7 @@ func TestPrimitiveObjectContracts(t *testing.T) {
 	})
 
 	t.Run("unicode-text-and-style", func(t *testing.T) {
-		text, style := []byte{0, 'H', 0, 'i'}, []byte{1, 2}
+		text, style := []byte{0, 'H', 0, 'i'}, []byte{0, 0}
 		var data bytes.Buffer
 		_ = binary.Write(&data, binary.BigEndian, uint16(len(text)))
 		data.Write(text)
@@ -80,6 +79,12 @@ func TestPrimitiveObjectContracts(t *testing.T) {
 		unicode := value.(*Object).Value.(*UnicodeText)
 		if !bytes.Equal(unicode.Text, text) || !bytes.Equal(unicode.Style, style) {
 			t.Fatalf("unicode = %#v", unicode)
+		}
+
+		invalidStyle := append([]byte{0, 0, 0, 2, 0, 1}, bytes.Repeat([]byte{0}, 19)...)
+		if _, err := contractParser(invalidStyle).loadBody(-1, 12, 6); err == nil ||
+			!strings.Contains(err.Error(), "style table size") {
+			t.Fatalf("invalid style table error = %v", err)
 		}
 	})
 }
@@ -194,7 +199,8 @@ func TestUserIdentifierContracts(t *testing.T) {
 		{"sourceName", "compiledName", "compiledName"},
 		{"sourceName", "", "sourceName"},
 	} {
-		value, err := contractParser(encode(test.key, test.value)).loadBody(-1, 11, 0)
+		encoded := encode(test.key, test.value)
+		value, err := contractParser(encoded).loadBody(-1, 11, uint16(len(encoded)-1))
 		if err != nil || string(value.(*Bytes).Data) != test.want {
 			t.Fatalf("identifier = %#v, %v; want %q", value, err, test.want)
 		}
@@ -282,7 +288,7 @@ func TestCompositeObjectContracts(t *testing.T) {
 	})
 
 	t.Run("record-shapes", func(t *testing.T) {
-		value, err := contractParser(nil).loadBody(-1, 6, 1)
+		value, err := contractParser(nil).loadBody(-1, 6, 0)
 		if err != nil || !value.(*Binding).Empty {
 			t.Fatalf("empty record = %#v, %v", value, err)
 		}
@@ -317,8 +323,8 @@ func TestParserResourceLimits(t *testing.T) {
 		!strings.Contains(err.Error(), "unknown FAS object type 255") {
 		t.Fatalf("unknown type error = %v", err)
 	}
-	if _, err := contractParser([]byte{0xfe}).loadBody(-1, 15, 0); err == nil ||
-		!strings.Contains(err.Error(), "unknown runtime value type 254") {
-		t.Fatalf("unknown runtime type error = %v", err)
+	value, err := contractParser([]byte{0xfe, 0xaa, 0xbb}).loadBody(-1, 15, 2)
+	if err != nil || value.(*TypedData).Type != 0xfe || !bytes.Equal(value.(*TypedData).Data, []byte{0xaa, 0xbb}) {
+		t.Fatalf("unknown runtime value = %#v, %v", value, err)
 	}
 }

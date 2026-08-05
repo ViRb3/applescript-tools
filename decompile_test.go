@@ -13,6 +13,8 @@ import (
 	"applescript-tools/passes"
 )
 
+const compiledFixtureCount = 62
+
 func TestDemoDecompiles(t *testing.T) {
 	f, err := os.Open("testdata/demo.scpt")
 	if err != nil {
@@ -35,8 +37,8 @@ func TestCompiledOracleFixtures(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(paths) != 58 {
-		t.Fatalf("found %d compiled fixtures, want 58", len(paths))
+	if len(paths) != compiledFixtureCount {
+		t.Fatalf("found %d compiled fixtures, want %d", len(paths), compiledFixtureCount)
 	}
 	for _, path := range paths {
 		name := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
@@ -79,8 +81,8 @@ func TestFixtureLayout(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(oracle) != 58 || len(compiled) != 58 || len(expected) != 58 {
-		t.Fatalf("fixture counts: oracle=%d compiled=%d expected=%d; want 58 each", len(oracle), len(compiled), len(expected))
+	if len(oracle) != compiledFixtureCount || len(compiled) != compiledFixtureCount || len(expected) != compiledFixtureCount {
+		t.Fatalf("fixture counts: oracle=%d compiled=%d expected=%d; want %d each", len(oracle), len(compiled), len(expected), compiledFixtureCount)
 	}
 	for _, source := range oracle {
 		name := strings.TrimSuffix(filepath.Base(source), ".applescript")

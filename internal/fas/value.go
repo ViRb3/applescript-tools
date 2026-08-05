@@ -62,6 +62,17 @@ type RawData struct{ Data []byte }
 
 func (*RawData) isValue() {}
 
+// TypedData preserves a serialized runtime class that the decompiler does not
+// understand. AppleScript's loader accepts data blocks for more classes than
+// the small set for which we currently have semantic decoders, so retaining
+// the class index and payload is safer than rejecting or misclassifying it.
+type TypedData struct {
+	Type byte
+	Data []byte
+}
+
+func (*TypedData) isValue() {}
+
 type Descriptor struct {
 	Type    [4]byte
 	Content []byte
@@ -141,6 +152,8 @@ func TypeName(v Value) string {
 		return "object"
 	case *RawData:
 		return "raw-data"
+	case *TypedData:
+		return "typed-data"
 	case *Descriptor:
 		return "descriptor"
 	case *EventIdentifier:

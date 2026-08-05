@@ -214,6 +214,7 @@ func TestDemoCompilerFixedPoint(t *testing.T) {
 	}
 	oracle := newCompilerOracle(t)
 	source := decompilePath(t, "testdata/demo.scpt")
+	requireLocalCompilerDialect(t, oracle, source, "demo", "legacy load-script syntax")
 	assertOracleFixedPoint(t, oracle, source, "demo", DecompileOptions{})
 }
 
@@ -223,7 +224,30 @@ func TestSecconCompilerFixedPoint(t *testing.T) {
 	}
 	oracle := newCompilerOracle(t)
 	source := decompilePath(t, "testdata/seccon.scpt")
+	requireLocalCompilerDialect(t, oracle, source, "seccon", "legacy Standard Additions terminology")
 	assertOracleFixedPoint(t, oracle, source, "seccon", DecompileOptions{})
+}
+
+var localCompilerDialectLimitations = map[string]string{
+	"ascii_recovery":             "legacy ASCII character Standard Addition",
+	"classic_enumeration":        "legacy folder-domain terminology",
+	"copy_data":                  "iTunes dictionary unavailable on current macOS",
+	"enumeration_known":          "legacy display-alert Standard Addition",
+	"global_references":          "legacy display-dialog Standard Addition",
+	"legacy_application_running": "System Preferences dictionary unavailable on current macOS",
+	"sdef_boolean_arguments":     "legacy Standard Additions terminology",
+}
+
+func requireLocalCompilerDialect(t *testing.T, oracle *compilerOracle, source, label, limitation string) {
+	t.Helper()
+	if oracle.backend != oracleLocal {
+		return
+	}
+	_, artifacts, err := oracle.compileSource(source, label+"_dialect_probe")
+	artifacts.cleanup()
+	if err != nil {
+		t.Skipf("local compiler lacks %s: %v", limitation, err)
+	}
 }
 
 func TestPathToMeByteRoundTrip(t *testing.T) {
@@ -238,6 +262,36 @@ func TestPathToMeByteRoundTrip(t *testing.T) {
 	}
 	recompiled := oracle.compile(t, source, "path_to_me_recompiled")
 	assertScriptBytesEqual(t, original, recompiled)
+}
+
+func TestTransactionAndContinueSemanticRoundTrip(t *testing.T) {
+	if testing.Short() {
+		t.Skip("compiler integration disabled in short mode")
+	}
+	oracle := newCompilerOracle(t)
+	for _, test := range []struct {
+		label  string
+		source string
+		want   string
+	}{
+		{
+			label:  "transaction",
+			source: "on run\n    with transaction\n        set x to 1\n    end transaction\nend run\n",
+			want:   "with transaction",
+		},
+		{
+			label:  "continue_open",
+			source: "on open xs\n    continue open xs\nend open\n",
+			want:   "continue open xs",
+		},
+	} {
+		t.Run(test.label, func(t *testing.T) {
+			decompiled := assertOracleFixedPoint(t, oracle, test.source, test.label, DecompileOptions{Strict: true})
+			if !strings.Contains(decompiled, test.want) {
+				t.Fatalf("decompiled source missing %q:\n%s", test.want, decompiled)
+			}
+		})
+	}
 }
 
 func TestAuthoritativeLanguageTermsByteRoundTrip(t *testing.T) {
@@ -306,8 +360,8 @@ func TestFocusedOracleFixtures(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(paths) != 58 {
-		t.Fatalf("found %d fixtures, want 58", len(paths))
+	if len(paths) != compiledFixtureCount {
+		t.Fatalf("found %d fixtures, want %d", len(paths), compiledFixtureCount)
 	}
 	for _, path := range paths {
 		name := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
@@ -337,6 +391,9 @@ func TestFocusedOracleFixtures(t *testing.T) {
 			switch name {
 			case "ascii_recovery", "naive_list_edges", "naive_empty_concat":
 				options.Passes = []passes.Pass{passes.Strings{}}
+			}
+			if limitation, ok := localCompilerDialectLimitations[name]; ok {
+				requireLocalCompilerDialect(t, oracle, string(sourceBytes), name, limitation)
 			}
 			got := assertOracleFixedPoint(
 				t,

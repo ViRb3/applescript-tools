@@ -59,6 +59,13 @@ func (f *Formatter) handler(handler *Handler, indent int) string {
 	if handler.IsRunHandler {
 		name = "run"
 	}
+	if handler.EventCode != nil && !handler.IsRunHandler && handler.UnresolvedParameters {
+		eventName := "«event " + rawCode(handler.EventCode[:]) + "»"
+		fmt.Fprintf(&b, "%son %s «unresolved parameters»\n", prefix, eventName)
+		b.WriteString(f.statements(handler.Body, indent+1))
+		fmt.Fprintf(&b, "%send %s", prefix, eventName)
+		return b.String()
+	}
 	if handler.EventCode != nil && !handler.IsRunHandler && hasLabeledHandlerParameter(handler.Parameters) {
 		eventName := "«event " + rawCode(handler.EventCode[:]) + "»"
 		fmt.Fprintf(&b, "%son %s", prefix, eventName)
@@ -82,6 +89,23 @@ func (f *Formatter) handler(handler *Handler, indent int) string {
 				b.WriteString(", ")
 			}
 			b.WriteString("«class " + rawCode(parameter.Code[:]) + "»:" + identifier(parameter.Name))
+		}
+		b.WriteByte('\n')
+		b.WriteString(f.statements(handler.Body, indent+1))
+		fmt.Fprintf(&b, "%send %s", prefix, eventName)
+		return b.String()
+	}
+	if handler.EventCode != nil && !handler.IsRunHandler {
+		eventName := "«event " + rawCode(handler.EventCode[:]) + "»"
+		if f.Terms != nil {
+			if command, ok := f.Terms.Command(*handler.EventCode); ok {
+				eventName = identifier(command.Name)
+			}
+		}
+		fmt.Fprintf(&b, "%son %s", prefix, eventName)
+		for _, parameter := range handler.Parameters {
+			b.WriteByte(' ')
+			b.WriteString(identifier(parameter.Name))
 		}
 		b.WriteByte('\n')
 		b.WriteString(f.statements(handler.Body, indent+1))
@@ -203,6 +227,13 @@ func (f *Formatter) stmt(statement Stmt, indent int) string {
 		return prefix + "considering " + strings.Join(node.Options, ", ") + "\n" + f.statements(node.Body, indent+1) + prefix + "end considering"
 	case *Timeout:
 		return prefix + "with timeout of " + f.expr(node.Seconds, 0) + " seconds\n" + f.statements(node.Body, indent+1) + prefix + "end timeout"
+	case *Transaction:
+		return prefix + "with transaction\n" + f.statements(node.Body, indent+1) + prefix + "end transaction"
+	case *Continue:
+		if node.Call == nil {
+			return prefix + "continue «unresolved»"
+		}
+		return prefix + "continue " + f.topLevelExpr(node.Call)
 	case *Return:
 		if node.Value == nil {
 			return prefix + "return"
@@ -256,6 +287,8 @@ func (f *Formatter) expr(expression Expr, parent int) string {
 		return `date ` + quoteString(node.Value)
 	case *RawDataLiteral:
 		return "«data " + rawCode(node.Type[:]) + hex.EncodeToString(node.Data) + "»"
+	case *OpaqueLiteral:
+		return fmt.Sprintf("«unsupported runtime data type %d: %s»", node.RuntimeType, hex.EncodeToString(node.Data))
 	case *Keyword:
 		if node.Fallback != "" {
 			return node.Fallback

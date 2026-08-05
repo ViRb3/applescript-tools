@@ -2,6 +2,7 @@ package decompile
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"applescript-tools/ast"
@@ -102,7 +103,10 @@ func TestEventHandlerParameterInference(t *testing.T) {
 		t.Fatal(err)
 	}
 	event, _ := terminology.ParseEventCode("emalcpma")
-	got := inferEventParameters(event, []string{"theMessages", "theRule", "localValue"}, terms)
+	got, complete := inferEventParameters(event, []string{"theMessages", "theRule", "localValue"}, terms)
+	if !complete {
+		t.Fatal("parameter inference unexpectedly ambiguous")
+	}
 	if len(got) != 2 {
 		t.Fatalf("parameters = %#v", got)
 	}
@@ -111,6 +115,23 @@ func TestEventHandlerParameterInference(t *testing.T) {
 	}
 	if got[1].Name != "theRule" || got[1].Code == nil || string(got[1].Code[:]) != "pmar" {
 		t.Fatalf("labeled parameter = %#v", got[1])
+	}
+}
+
+func TestEventHandlerParameterInferenceRejectsAmbiguousNames(t *testing.T) {
+	dictionary, err := terminology.ParseSDEF("test", strings.NewReader(
+		`<dictionary><suite name="test" code="test"><command name="handle" code="testhand">`+
+			`<parameter name="for rule" code="rule" type="text"/>`+
+			`</command></suite></dictionary>`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	terms := terminology.New()
+	terms.Add(dictionary)
+	event, _ := terminology.ParseEventCode("testhand")
+	parameters, complete := inferEventParameters(event, []string{"theRule", "backupRule"}, terms)
+	if complete || len(parameters) != 0 {
+		t.Fatalf("ambiguous mapping was guessed: %#v, complete=%v", parameters, complete)
 	}
 }
 
@@ -188,6 +209,95 @@ func TestStoreResultDiscardsCompilerDuplicate(t *testing.T) {
 	expression, ok := s.handler.Body[0].(*ast.Expression)
 	if !ok || expression.Value != value {
 		t.Fatalf("stored result = %#v", s.handler.Body)
+	}
+}
+
+func TestUndefinedControlMarkerDoesNotDisplaceExpressionValues(t *testing.T) {
+	s := contractState(t)
+	if err := s.instruction(instruction(104, "PushUndefined", 0)); err != nil {
+		t.Fatal(err)
+	}
+	s.push(&ast.NumberLiteral{Integer: 2})
+	s.pending = &ast.Variable{Name: "answer"}
+	if err := s.instruction(instruction(79, "StoreResult", 1)); err != nil {
+		t.Fatal(err)
+	}
+	if len(s.handler.Body) != 1 || s.undefined != 1 {
+		t.Fatalf("marker displaced result: body=%#v markers=%d", s.handler.Body, s.undefined)
+	}
+	if err := s.instruction(instruction(79, "StoreResult", 2)); err != nil {
+		t.Fatal(err)
+	}
+	if s.undefined != 0 {
+		t.Fatalf("control marker was not consumed: %d", s.undefined)
+	}
+}
+
+func TestTransactionAndOfOpcodesBuildStructuredAST(t *testing.T) {
+	s := contractState(t)
+	branch := bytecode.Operand{Kind: bytecode.OperandBranchTarget, Value: 10}
+	if err := s.instruction(instruction(112, "BeginTransaction", 0, branch)); err != nil {
+		t.Fatal(err)
+	}
+	s.emit(&ast.Expression{Value: &ast.Variable{Name: "work"}})
+	if err := s.instruction(instruction(113, "EndTransaction", 9)); err != nil {
+		t.Fatal(err)
+	}
+	transaction, ok := s.handler.Body[0].(*ast.Transaction)
+	if !ok || len(transaction.Body) != 1 {
+		t.Fatalf("transaction = %#v", s.handler.Body)
+	}
+
+	s.stack = []ast.Expr{&ast.Variable{Name: "container"}}
+	if err := s.instruction(instruction(82, "Of", 10, branch)); err != nil {
+		t.Fatal(err)
+	}
+	s.push(&ast.Variable{Name: "property"})
+	if err := s.instruction(instruction(84, "EndOf", 11)); err != nil {
+		t.Fatal(err)
+	}
+	of, ok := s.pop().(*ast.Binary)
+	if !ok || of.Op != ast.Of || of.Left.(*ast.Variable).Name != "property" || of.Right.(*ast.Variable).Name != "container" {
+		t.Fatalf("of expression = %#v", of)
+	}
+}
+
+func TestEveryPropCanonicalizesToProperties(t *testing.T) {
+	s := contractState(t)
+	s.stack = []ast.Expr{
+		&ast.Variable{Name: "documentValue"},
+		&ast.Keyword{Code: []byte("prop")},
+	}
+	s.makeSpecifier(22)
+	specifier, ok := s.pop().(*ast.Specifier)
+	if !ok {
+		t.Fatalf("properties alias = %#v", specifier)
+	}
+	keyword, keywordOK := specifier.Object.(*ast.Keyword)
+	if !keywordOK || specifier.Kind != ast.PropertySpecifier || keyword.Fallback != "properties" {
+		t.Fatalf("properties alias = %#v", specifier)
+	}
+}
+
+func TestPositionalContinueBuildsExplicitStatement(t *testing.T) {
+	s := contractState(t, &fas.Bytes{Data: []byte("nextHandler")})
+	s.stack = []ast.Expr{
+		&ast.Me{},
+		&ast.NumberLiteral{Integer: 7},
+		&ast.NumberLiteral{Integer: 1},
+		&ast.It{},
+	}
+	operand := bytecode.Operand{Kind: bytecode.OperandLiteralIndex, Value: 0}
+	if err := s.instruction(instruction(74, "PositionalContinue", 0, operand)); err != nil {
+		t.Fatal(err)
+	}
+	statement, ok := s.handler.Body[0].(*ast.Continue)
+	if !ok {
+		t.Fatalf("continue = %#v", s.handler.Body)
+	}
+	call, callOK := statement.Call.(*ast.HandlerCall)
+	if !callOK || call.Name != "nextHandler" || call.Target != nil || len(call.Arguments) != 1 {
+		t.Fatalf("continue = %#v", s.handler.Body)
 	}
 }
 
@@ -471,7 +581,7 @@ func TestTypedArgumentContracts(t *testing.T) {
 		&ast.Keyword{Code: []byte("badm")},
 		&ast.BooleanLiteral{Value: true},
 	}
-	arguments := typedArguments(values, terms, event)
+	arguments := typedArguments(values, terms, event, "")
 	if len(arguments) != 2 {
 		t.Fatalf("arguments = %#v", arguments)
 	}

@@ -47,13 +47,22 @@ func literal(value fas.Value) ast.Expr {
 		return literal(value.Value)
 	case *fas.RawData:
 		return rawData(value.Data)
+	case *fas.TypedData:
+		return &ast.OpaqueLiteral{RuntimeType: value.Type, Data: append([]byte(nil), value.Data...)}
 	case *fas.Descriptor:
 		if string(value.Type[:]) == "ldt " {
 			if result := longDate(value.Content); result != nil {
 				return result
 			}
 		}
-		return &ast.Application{Name: aliasName(value.Content)}
+		if string(value.Type[:]) == "alis" {
+			if name, ok := aliasName(value.Content); ok {
+				return &ast.Application{Name: name}
+			}
+		}
+		var code terminology.Code4
+		copy(code[:], value.Type[:])
+		return &ast.RawDataLiteral{Type: code, Data: append([]byte(nil), value.Content...)}
 	case *fas.Pair:
 		var elements []ast.Expr
 		seen := map[*fas.Pair]bool{}
@@ -205,22 +214,21 @@ func longDate(data []byte) ast.Expr {
 	return &ast.DateLiteral{Value: text}
 }
 
-func aliasName(content []byte) string {
-	if len(content) > 51 && content[7] == 2 {
-		n := int(content[50])
-		if 51+n <= len(content) {
-			name := string(content[51 : 51+n])
-			return legacyApplicationName(strings.TrimSuffix(name, ".app"))
-		}
+func aliasName(content []byte) (string, bool) {
+	// Alias record version 2 stores the target's Pascal name at offset 50.
+	// Validate the record and field bounds before canonicalizing the target.
+	if len(content) < 51 || content[6] != 0 || content[7] != 2 {
+		return "", false
 	}
-	value := string(content)
-	if before, _, ok := strings.Cut(value, ".app/"); ok {
-		value = before
+	n := int(content[50])
+	if n == 0 || n > 63 || 51+n > len(content) {
+		return "", false
 	}
-	if index := strings.LastIndex(value, ":"); index >= 0 {
-		value = value[index+1:]
+	name := strings.TrimSuffix(string(content[51:51+n]), ".app")
+	if name == "" || strings.IndexByte(name, 0) >= 0 {
+		return "", false
 	}
-	return legacyApplicationName(strings.Trim(value, "\x00"))
+	return legacyApplicationName(name), true
 }
 
 func legacyApplicationName(name string) string {

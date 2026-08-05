@@ -123,7 +123,7 @@ func TestPermissiveReferenceMismatchReusesHeader(t *testing.T) {
 	}
 }
 
-func TestPermissiveReferenceMismatchRecoveryIsNotLimitedToFive(t *testing.T) {
+func TestPermissiveReferenceMismatchRecoveryStopsAtFrameworkLimit(t *testing.T) {
 	p := &parser{
 		r:    bytes.NewReader([]byte{3, 0, 47, 0, 7}),
 		opts: Options{Limits: DefaultLimits()},
@@ -133,7 +133,7 @@ func TestPermissiveReferenceMismatchRecoveryIsNotLimitedToFive(t *testing.T) {
 		p.refs[index] = refEntry{state: refReserved, value: NIL}
 	}
 
-	for expected := int16(32); expected < 47; expected++ {
+	for expected := int16(32); expected < 37; expected++ {
 		value, err := p.loadObject(expected)
 		if err != nil {
 			t.Fatalf("missing reference %d: %v", expected, err)
@@ -142,12 +142,8 @@ func TestPermissiveReferenceMismatchRecoveryIsNotLimitedToFive(t *testing.T) {
 			t.Fatalf("missing reference %d = %#v, want nil", expected, value)
 		}
 	}
-	value, err := p.loadObject(47)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if value != Integer(7) || p.reuse != nil || len(p.diagnostics) != 15 {
-		t.Fatalf("recovery = value %#v, reuse %#v, diagnostics %d", value, p.reuse, len(p.diagnostics))
+	if _, err := p.loadObject(37); err == nil || !strings.Contains(err.Error(), "expected 37, found 47") {
+		t.Fatalf("sixth mismatch error = %v", err)
 	}
 }
 
@@ -161,14 +157,14 @@ func TestPermissiveReferenceMismatchRecoveryRespectsReferenceLimit(t *testing.T)
 		reuse: nil,
 	}
 
-	for expected := int16(0); expected < 2; expected++ {
+	for expected := int16(0); expected < 5; expected++ {
 		if _, err := p.loadObject(expected); err != nil {
 			t.Fatalf("mismatch %d: %v", expected, err)
 		}
 	}
-	if _, err := p.loadObject(2); err == nil ||
-		!strings.Contains(err.Error(), "expected 2, found 47") {
-		t.Fatalf("third mismatch error = %v", err)
+	if _, err := p.loadObject(5); err == nil ||
+		!strings.Contains(err.Error(), "expected 5, found 47") {
+		t.Fatalf("sixth mismatch error = %v", err)
 	}
 }
 
