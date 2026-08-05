@@ -1,0 +1,2 @@
+# SDEF snapshots preserve /usr/bin/sdef output byte-for-byte for provenance.
+terminology/data/*.sdef whitespace=-blank-at-eol

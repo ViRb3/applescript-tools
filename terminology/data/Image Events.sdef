@@ -152,9 +152,6 @@
 			<responds-to command="delete">
 				<cocoa method="deleteVerb:" />
 			</responds-to>
-			<responds-to command="do script">
-				<cocoa method="doScript:" />
-			</responds-to>
 			<element type="alias" />
 			<element type="disk item" />
 			<element type="file" />
@@ -258,9 +255,6 @@
 			<responds-to command="open">
 				<cocoa method="open:" />
 			</responds-to>
-			<responds-to command="do script">
-				<cocoa method="doScriptVerb:" />
-			</responds-to>
 			<property name="busy status" code="busy" type="boolean" access="r" description="Is the disk item busy?" />
 			<property name="container" code="ctnr" type="disk item" access="r" description="the folder or disk which has this disk item as an element" />
 			<property name="creation date" code="ascd" type="date" access="r" description="the date on which the disk item was created" />
@@ -341,9 +335,6 @@
 		</class>
 		<class name="file" code="file" description="A file in the file system" inherits="disk item" plural="files">
 			<cocoa class="File" />
-			<responds-to command="do script">
-				<cocoa method="doScript:" />
-			</responds-to>
 			<property name="creator type" code="fcrt" description="the OSType identifying the application that created the file">
 				<type type="text" />
 				<type type="any" />

@@ -2,8 +2,11 @@
 <!DOCTYPE dictionary SYSTEM "file://localhost/System/Library/DTDs/sdef.dtd"
 [
     <!ELEMENT class (cocoa?, access-group*, type?, (contents | documentation | element | property | responds-to | synonym | xref)*)>
+    <!ENTITY % common.attrib
+        "xmlns:xi   CDATA   #FIXED 'http://www.w3.org/2001/XInclude'
+         xml:base   CDATA   #IMPLIED">
 ]>
-<dictionary xmlns:xi="http://www.w3.org/2003/XInclude" title="Keynote Terminology">
+<dictionary xmlns:xi="http://www.w3.org/2001/XInclude" title="Keynote Terminology">
     <xi:include href="file:///System/Library/ScriptingDefinitions/CocoaStandard.sdef" xpointer="xpointer(/dictionary/suite)" />
     <suite name="Keynote Suite" code="kyst" description="Classes and commands for Keynote.">
         <enumeration name="saveable file format" code="savf">
@@ -43,26 +46,78 @@
             </enumerator>
         </enumeration>
         <enumeration name="movie export formats" code="Knmf">
-            <enumerator name="360p" code="Kmf3" description="360p">
+            <enumerator name="format360p" code="Kmf3" description="360p">
                 <cocoa integer-value="1" />
                 <synonym name="small" />
             </enumerator>
-            <enumerator name="540p" code="Kmf5" description="540p">
+            <enumerator name="format540p" code="Kmf5" description="540p">
                 <cocoa integer-value="2" />
                 <synonym name="medium" />
             </enumerator>
-            <enumerator name="720p" code="Kmf7" description="720p">
+            <enumerator name="format720p" code="Kmf7" description="720p">
                 <cocoa integer-value="3" />
                 <synonym name="large" />
             </enumerator>
-            <enumerator name="1080p" code="Kmf8" description="1080p">
+            <enumerator name="format1080p" code="Kmf8" description="1080p">
                 <cocoa integer-value="4" />
             </enumerator>
-            <enumerator name="2160p" code="Kmf4" description="DCI 4K (4096x2160)">
+            <enumerator name="format2160p" code="Kmf4" description="DCI 4K (4096x2160)">
                 <cocoa integer-value="5" />
             </enumerator>
             <enumerator name="native size" code="KmfN" description="Exported movie will have the same dimensions as the document, up to 4096x2160">
                 <cocoa integer-value="-1" />
+            </enumerator>
+        </enumeration>
+        <enumeration name="movie codecs" code="Knmc">
+            <enumerator name="h264" code="Kmc1" description="H.264">
+                <cocoa string-value="AVVideoCodecTypeH264" />
+            </enumerator>
+            <enumerator name="AppleProRes422" code="Kmc2" description="Apple ProRes 422">
+                <cocoa string-value="AVVideoCodecTypeAppleProRes422" />
+            </enumerator>
+            <enumerator name="AppleProRes4444" code="Kmc3" description="Apple ProRes 4444">
+                <cocoa string-value="AVVideoCodecTypeAppleProRes4444" />
+            </enumerator>
+            <enumerator name="AppleProRes422LT" code="Kmc4" description="Apple ProRes 422LT">
+                <cocoa string-value="AVVideoCodecTypeAppleProRes422LT" />
+            </enumerator>
+            <enumerator name="AppleProRes422HQ" code="Kmc5" description="Apple ProRes 422HQ">
+                <cocoa string-value="AVVideoCodecTypeAppleProRes422HQ" />
+            </enumerator>
+            <enumerator name="AppleProRes422Proxy" code="Kmc6" description="Apple ProRes 422Proxy">
+                <cocoa string-value="AVVideoCodecTypeAppleProRes422Proxy" />
+            </enumerator>
+            <enumerator name="HEVC" code="Kmc7" description="HEVC">
+                <cocoa string-value="AVVideoCodecTypeHEVC" />
+            </enumerator>
+        </enumeration>
+        <enumeration name="movie framerates" code="Knfr">
+            <enumerator name="FPS12" code="Kfr1" description="12 FPS">
+                <cocoa string-value="KNMovieExportFrameRateOption12" />
+            </enumerator>
+            <enumerator name="FPS2398" code="Kfr2" description="23.98 FPS">
+                <cocoa string-value="KNMovieExportFrameRateOption2398" />
+            </enumerator>
+            <enumerator name="FPS24" code="Kfr3" description="24 FPS">
+                <cocoa string-value="KNMovieExportFrameRateOption24" />
+            </enumerator>
+            <enumerator name="FPS25" code="Kfr4" description="25 FPS">
+                <cocoa string-value="KNMovieExportFrameRateOption25" />
+            </enumerator>
+            <enumerator name="FPS2997" code="Kfr5" description="29.97 FPS">
+                <cocoa string-value="KNMovieExportFrameRateOption2997" />
+            </enumerator>
+            <enumerator name="FPS30" code="Kfr6" description="30 FPS">
+                <cocoa string-value="KNMovieExportFrameRateOption30" />
+            </enumerator>
+            <enumerator name="FPS50" code="Kfr7" description="50 FPS">
+                <cocoa string-value="KNMovieExportFrameRateOption50" />
+            </enumerator>
+            <enumerator name="FPS5994" code="Kfr8" description="59.94 FPS">
+                <cocoa string-value="KNMovieExportFrameRateOption5994" />
+            </enumerator>
+            <enumerator name="FPS60" code="Kfr9" description="60 FPS">
+                <cocoa string-value="KNMovieExportFrameRateOption60" />
             </enumerator>
         </enumeration>
         <enumeration name="print what" code="Knpw">
@@ -97,8 +152,14 @@
             <property name="movie format" code="Kxmf" type="movie export formats" description="format for exported movie.">
                 <cocoa key="ExportMoviePreset" />
             </property>
+            <property name="movie codec" code="Kxmc" type="movie codecs" description="codec for movie exported at native size.">
+                <cocoa key="ExportMovieCodec" />
+            </property>
+            <property name="movie framerate" code="Kxmr" type="movie framerates" description="frame rate for movie exported at native size.">
+                <cocoa key="ExportMovieFrameRate" />
+            </property>
             <property name="export style" code="Kxpw" type="print what" description="choose whether to include notes, etc.">
-                <cocoa key="KNPrintWhatTag" />
+                <cocoa key="KNPrintLayoutKey" />
             </property>
             <property name="all stages" code="Kxpa" type="boolean" description="print each stage of builds">
                 <cocoa key="KNPrintEachBuild" />
@@ -123,6 +184,9 @@
             </property>
             <property name="password hint" code="KxPH" type="text" description="password hint">
                 <cocoa key="TSKExportOptionsPassphraseHint" />
+            </property>
+            <property name="include comments" code="KxRC" type="boolean" description="include comments description">
+                <cocoa key="TSKExportOptionsRenderComments" />
             </property>
             <property name="PDF image quality" code="KxPI" type="PDF image quality" description="quality of images in PDF document">
                 <cocoa key="TSKExportOptionsImageQuality" />
@@ -149,7 +213,7 @@
                              <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">QuickTime Movie</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">m4v</td></tr>
                              <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">PDF</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">pdf</td></tr>
                              <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">slide images</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">N/A</td></tr>
-                             <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">Microsoft PowerPoint</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">pptx, ppt</td></tr>
+                             <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">Microsoft PowerPoint</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">pptx</td></tr>
                              <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">Keynote 09</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">key</td></tr>
                          </table>
                     </div>
@@ -199,7 +263,7 @@
             <element type="slide" access="rw">
                 <cocoa key="orderedSlides" />
             </element>
-            <element type="master slide" access="r">
+            <element type="slide layout" access="r">
                 <cocoa key="orderedMasters" />
             </element>
             <responds-to command="export">
@@ -227,16 +291,18 @@
                 <cocoa method="handleAcceptSlideSwitcherScriptCommand:" />
             </responds-to>
         </class-extension>
-        <class name="master slide" code="KnMs" description="A master slide in a theme or slideshow document" inherits="slide">
+        <class name="slide layout" code="KnMs" description="A slide layout in a theme or slideshow document" inherits="slide">
             <cocoa class="KNMacScriptingMasterSlide" />
-            <property name="name" code="pnam" type="text" description="The name of the master slide" access="r">
+            <synonym name="master slide" />
+            <property name="name" code="pnam" type="text" description="The name of the slide layout" access="r">
                 <cocoa key="name" />
             </property>
         </class>
         <class name="slide" code="KnSd" description="A slide in a slideshow document" inherits="iWork container">
             <cocoa class="KNMacScriptingSlide" />
-            <property name="base slide" code="smas" type="master slide" access="rw" description="The master slide this slide is based upon">
+            <property name="base layout" code="smas" type="slide layout" access="rw" description="The slide layout this slide is based upon">
                 <cocoa key="master" />
+                <synonym name="base slide" />
             </property>
             <property name="body showing" code="Kbsh" type="boolean" access="rw" description="Is the default body text displayed?">
                 <cocoa key="bodyVisible" />
@@ -266,8 +332,8 @@
                 <html>
                     <![CDATA[
                     <div style="margin-top:8px;background-color:#eee;padding:8px;">
-                    <p>EXAMPLE SCRIPT: Apply a new master slide to the currently selected slide</p>
-                    <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><b>tell the front</b> <span style="color:blue;font-style:italic;">document</span> <b>to set the</b> <span style="color:#6600CC;">base slide</span> <b>of the</b> <span style="color:#6600CC;">current slide</span> <b>to</b> <span style="color:#6600CC;">master slide</span> &quot;Blank&quot;</p>
+                    <p>EXAMPLE SCRIPT: Apply a new slide layout to the currently selected slide</p>
+                    <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><b>tell the front</b> <span style="color:blue;font-style:italic;">document</span> <b>to set the</b> <span style="color:#6600CC;">base slide</span> <b>of the</b> <span style="color:#6600CC;">current slide</span> <b>to</b> <span style="color:#6600CC;">slide layout</span> &quot;Blank&quot;</p>
                     </div>
                     <div style="margin-top:8px;background-color:#eee;padding:8px;">
                     <p>EXAMPLE SCRIPT: skip every slide that contains "classified" in the slide title</p>
@@ -299,7 +365,7 @@
 </html>
             </documentation>
         </class>
-        <class name="theme" code="Knth" description="A collection of master slides, with shared design intents and elements.">
+        <class name="theme" code="Knth" description="A collection of slide layouts, with shared design intents and elements.">
             <cocoa class="KNMacThemeDescription" />
             <property name="id" code="ID  " type="text" description="The identifier used by the application." access="r">
                 <cocoa key="identifier" />
@@ -315,12 +381,13 @@
                         <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><b>set the</b> <span style="color:green;">installedThemes</span> <b>to the</b> <span style="color:purple;">name</span> <b>of every</b> <span style="color:blue;font-style:italic;">theme</span></p>
                     </div>
                     <div style="margin-top:8px;background-color:#eee;padding:8px;">
-                        <p>EXAMPLE SCRIPT: Create a new Keynote document using a theme</p>
-                        <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><span style="color:blue;"><b>make</b> new <i>document</i> with properties</span> {<span style="color:blue;">document theme</span>:<span style="color:blue;">theme</span> &quot;Gradient&quot;, <span style="color:blue;">document width</span>:1920, <span style="color:blue;">document height</span>:1080}</p>
-                    </div>
-                    <div style="margin-top:8px;background-color:#eee;padding:8px;">
                         <p>EXAMPLE SCRIPT: Changing the theme of a Keynote document</p>
                         <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><b>set the</b> <span style="color:blue;font-style:italic;">document theme</span> <b>of the front</b> <span style="color:blue;font-style:italic;">document</span> <b>to</b> <span style="color:blue;font-style:italic;">theme</span> &quot;White&quot;</p>
+                    </div>
+                    <div style="margin-top:8px;background-color:#eee;padding:8px;">
+                        <p>EXAMPLE SCRIPT: Create a new Keynote document using a theme</p>
+                        <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><span style="color:blue;"><b>make</b> new <i>document</i> with properties</span> {<span style="color:blue;">document theme</span>:<span style="color:blue;">theme</span> &quot;Gradient&quot;, <span style="color:blue;">width</span>:1920, <span style="color:blue;">height</span>:1080}</p>
+                        <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><span style="color:blue;"><b>make</b> new <i>document</i> with data <i>POSIX file</i></span> &quot;&#47;path&#47;to&#47;user-theme.kth&quot;</p>
                     </div>
                 ]]>
 </html>
@@ -328,130 +395,133 @@
         </class>
         <enumeration name="transition effects" code="teff">
             <enumerator name="no transition effect" code="tnil" description="">
-                <cocoa integer-value="0" />
+                <cocoa string-value="none" />
             </enumerator>
             <enumerator name="magic move" code="tmjv" description="">
-                <cocoa integer-value="1" />
+                <cocoa string-value="apple:magic-move-implied-motion-path" />
             </enumerator>
             <enumerator name="shimmer" code="tshm" description="">
-                <cocoa integer-value="2" />
+                <cocoa string-value="apple:ca-text-shimmer" />
             </enumerator>
             <enumerator name="sparkle" code="tspk" description="">
-                <cocoa integer-value="3" />
+                <cocoa string-value="apple:ca-text-sparkle" />
             </enumerator>
             <enumerator name="swing" code="tswg" description="">
-                <cocoa integer-value="4" />
+                <cocoa string-value="apple:ca-swing" />
             </enumerator>
             <enumerator name="object cube" code="tocb" description="">
-                <cocoa integer-value="5" />
+                <cocoa string-value="apple:ca-cube" />
             </enumerator>
             <enumerator name="object flip" code="tofp" description="">
-                <cocoa integer-value="6" />
+                <cocoa string-value="apple:ca-dissolve-and-flip" />
             </enumerator>
             <enumerator name="object pop" code="topp" description="">
-                <cocoa integer-value="7" />
+                <cocoa string-value="apple:ca-pop" />
             </enumerator>
             <enumerator name="object push" code="toph" description="">
-                <cocoa integer-value="8" />
+                <cocoa string-value="apple:ca-push" />
             </enumerator>
             <enumerator name="object revolve" code="torv" description="">
-                <cocoa integer-value="32" />
+                <cocoa string-value="apple:ca-revolve" />
             </enumerator>
             <enumerator name="object zoom" code="tozm" description="">
-                <cocoa integer-value="9" />
+                <cocoa string-value="apple:ca-zoom" />
             </enumerator>
             <enumerator name="perspective" code="tprs" description="">
-                <cocoa integer-value="33" />
+                <cocoa string-value="apple:ca-isometric" />
             </enumerator>
             <enumerator name="clothesline" code="tclo" description="">
-                <cocoa integer-value="10" />
+                <cocoa string-value="apple:ClotheslinePush" />
             </enumerator>
             <enumerator name="confetti" code="tcft" description="">
-                <cocoa integer-value="34" />
+                <cocoa string-value="com.apple.iWork.Keynote.KLNConfetti" />
             </enumerator>
             <enumerator name="dissolve" code="tdis" description="">
-                <cocoa integer-value="11" />
+                <cocoa string-value="apple:dissolve" />
             </enumerator>
             <enumerator name="drop" code="tdrp" description="">
-                <cocoa integer-value="12" />
+                <cocoa string-value="apple:bounce" />
             </enumerator>
             <enumerator name="droplet" code="tdpl" description="">
-                <cocoa integer-value="35" />
+                <cocoa string-value="apple:droplet" />
             </enumerator>
             <enumerator name="fade through color" code="tftc" description="">
-                <cocoa integer-value="13" />
+                <cocoa string-value="com.apple.iWork.Keynote.BLTFadeThruColor" />
             </enumerator>
             <enumerator name="grid" code="tgrd" description="">
-                <cocoa integer-value="36" />
+                <cocoa string-value="apple:apple-grid" />
             </enumerator>
             <enumerator name="iris" code="tirs" description="">
-                <cocoa integer-value="14" />
+                <cocoa string-value="apple:wipe-iris" />
             </enumerator>
             <enumerator name="move in" code="tmvi" description="">
-                <cocoa integer-value="15" />
+                <cocoa string-value="apple:slide" />
             </enumerator>
             <enumerator name="push" code="tpsh" description="">
-                <cocoa integer-value="16" />
+                <cocoa string-value="apple:push" />
             </enumerator>
             <enumerator name="reveal" code="trvl" description="">
-                <cocoa integer-value="17" />
+                <cocoa string-value="apple:reveal" />
             </enumerator>
             <enumerator name="switch" code="tswi" description="">
-                <cocoa integer-value="18" />
+                <cocoa string-value="apple:FlipThrough" />
             </enumerator>
             <enumerator name="wipe" code="twpe" description="">
-                <cocoa integer-value="19" />
+                <cocoa string-value="apple:wipe" />
             </enumerator>
             <enumerator name="blinds" code="tbld" description="">
-                <cocoa integer-value="37" />
+                <cocoa string-value="com.apple.iWork.Keynote.BLTBlinds" />
             </enumerator>
             <enumerator name="color planes" code="tcpl" description="">
-                <cocoa integer-value="38" />
+                <cocoa string-value="com.apple.iWork.Keynote.KLNColorPlanes" />
             </enumerator>
             <enumerator name="cube" code="tcub" description="">
-                <cocoa integer-value="20" />
+                <cocoa string-value="apple:3D-cube" />
             </enumerator>
             <enumerator name="doorway" code="tdwy" description="">
-                <cocoa integer-value="21" />
+                <cocoa string-value="apple:doorway" />
             </enumerator>
             <enumerator name="fall" code="tfal" description="">
-                <cocoa integer-value="39" />
+                <cocoa string-value="apple:fall" />
             </enumerator>
             <enumerator name="flip" code="tfip" description="">
-                <cocoa integer-value="22" />
+                <cocoa string-value="apple:revolve" />
             </enumerator>
             <enumerator name="flop" code="tfop" description="">
-                <cocoa integer-value="23" />
+                <cocoa string-value="com.apple.iWork.Keynote.BUKFlop" />
             </enumerator>
             <enumerator name="mosaic" code="tmsc" description="">
-                <cocoa integer-value="24" />
+                <cocoa string-value="com.apple.iWork.Keynote.BLTMosaicFlip" />
             </enumerator>
             <enumerator name="page flip" code="tpfl" description="">
-                <cocoa integer-value="25" />
+                <cocoa string-value="apple:pageflip" />
             </enumerator>
             <enumerator name="pivot" code="tpvt" description="">
-                <cocoa integer-value="40" />
+                <cocoa string-value="apple:pivot" />
             </enumerator>
             <enumerator name="reflection" code="trfl" description="">
-                <cocoa integer-value="26" />
+                <cocoa string-value="com.apple.iWork.Keynote.BLTReflection" />
             </enumerator>
             <enumerator name="revolving door" code="trev" description="">
-                <cocoa integer-value="27" />
+                <cocoa string-value="com.apple.iWork.Keynote.BLTRevolvingDoor" />
             </enumerator>
             <enumerator name="scale" code="tscl" description="">
-                <cocoa integer-value="28" />
+                <cocoa string-value="apple:scale" />
             </enumerator>
             <enumerator name="swap" code="tswp" description="">
-                <cocoa integer-value="29" />
+                <cocoa string-value="com.apple.iWork.Keynote.KLNSwap" />
             </enumerator>
             <enumerator name="swoosh" code="tsws" description="">
-                <cocoa integer-value="41" />
+                <cocoa string-value="com.apple.iWork.Keynote.BLTSwoosh" />
             </enumerator>
             <enumerator name="twirl" code="ttwl" description="">
-                <cocoa integer-value="30" />
+                <cocoa string-value="apple:twirl" />
             </enumerator>
             <enumerator name="twist" code="ttwi" description="">
-                <cocoa integer-value="31" />
+                <cocoa string-value="com.apple.iWork.Keynote.BUKTwist" />
+            </enumerator>
+            <enumerator name="fade and move" code="tfad" description="">
+                <cocoa string-value="apple:fade-and-move" />
             </enumerator>
         </enumeration>
         <record-type name="transition settings" code="xset" description="Properties common to all transitions">
@@ -488,6 +558,12 @@
                 <cocoa key="WithProperties" />
             </parameter>
         </command>
+        <command name="get" code="coregetd" description="Returns the value of the specified object(s).">
+            <cocoa class="TMAScriptGetCommand" />
+            <access-group identifier="*" />
+            <direct-parameter type="specifier" requires-access="r" />
+            <result type="any" />
+        </command>
     </suite>
     <suite name="iWork Text Suite" code="iWtx" description="Classes and commands for iWorks text objects.">
         <value-type name="color" code="colr">
@@ -503,7 +579,7 @@
             <property name="font" code="font" type="text" description="The name of the font.  Can be the PostScript name, such as: &#8220;TimesNewRomanPS-ItalicMT&#8221;, or display name: &#8220;Times New Roman Italic&#8221;. TIP: Use the Font Book application get the information about a typeface.">
                 <cocoa key="fontName" />
             </property>
-            <property name="size" code="ptsz" type="integer" description="The size of the font.">
+            <property name="size" code="ptsz" type="real" description="The size of the font.">
                 <cocoa key="fontSize" />
             </property>
             <element type="character" />
@@ -571,6 +647,53 @@
         </command>
         <command name="unmerge" code="NmTbSpUm" description="Unmerge all merged cells in a specified range.">
             <direct-parameter type="range" />
+        </command>
+        <class-extension extends="document">
+            <property name="selection" code="sele" description="A list of the currently selected items." access="rw">
+                <cocoa key="scriptSelection" />
+                <type type="iWork item" list="yes" />
+            </property>
+            <property name="password protected" code="pwpt" type="boolean" description="Whether the document is password protected or not." access="r" />
+            <responds-to command="set password">
+                <cocoa method="handleSetPasswordScriptCommand:" />
+            </responds-to>
+            <responds-to command="remove password">
+                <cocoa method="handleRemovePasswordScriptCommand:" />
+            </responds-to>
+        </class-extension>
+        <command name="set password" code="NmTbPset" description="Set a password to an unencrypted document.">
+            <cocoa class="TMAScriptDocumentPasswordCommand" />
+            <direct-parameter type="text" />
+            <parameter name="to" code="Pdoc" type="document" optional="yes" description="The document to set a password to. If unspecified, the current target is assumed." />
+            <parameter name="hint" code="Phin" type="text" optional="yes" description="A hint for the password." />
+            <parameter name="saving in keychain" code="Pkch" type="boolean" optional="yes" description="Whether to save the password in keychain or not. By default, the password is not saved in the keychain." />
+            <documentation>
+                <html>
+                    <![CDATA[
+                    <div style="margin-top:8px;background-color:#eee;padding:8px;">
+                        <p>EXAMPLE SCRIPT:</p>
+                        <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><span style="color:blue;"><b>set password</b></span> &quot;p4ssw0rd&quot; <span style="color:blue;">to</span> <b>first</b> <span style="color:blue;"><i>document</i></span> <span style="color:blue;">hint</span> &quot;See the sticky note&quot; <span style="color:blue;">saving in keychain true</span></p>
+                        <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><b>tell</b> <span style="color:blue;"><i>document</i></span> &quot;Jc's Story Book&quot; <b>to <span style="color:blue;">set password</span></b> &quot;p4ssw0rd&quot;</p>
+                    </div>
+                ]]>
+</html>
+            </documentation>
+        </command>
+        <command name="remove password" code="NmTbPdel" description="Remove the password from the document.">
+            <cocoa class="TMAScriptDocumentPasswordCommand" />
+            <direct-parameter type="text" description="The current password of the document." />
+            <parameter name="from" code="Pdoc" type="document" optional="yes" description="The document from which to remove the password. If unspecified, the current target is assumed." />
+            <documentation>
+                <html>
+                    <![CDATA[
+                    <div style="margin-top:8px;background-color:#eee;padding:8px;">
+                        <p>EXAMPLE SCRIPT:</p>
+                        <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><span style="color:blue;"><b>remove password</b></span> &quot;p4ssw0rd&quot; <span style="color:blue;">from</span> <b>last</b> <span style="color:blue;"><i>document</i></span></p>
+                        <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><b>tell</b> <span style="color:blue;"><i>document</i></span> &quot;Letter to Sun Young&quot; <b>to <span style="color:blue;">remove password</span></b> &quot;p4ssw0rd&quot;</p>
+                    </div>
+                ]]>
+</html>
+            </documentation>
         </command>
         <class name="iWork container" code="iwkc" description="A container for iWork items">
             <element type="audio clip">
@@ -1125,7 +1248,7 @@
             <parameter name="set titles" type="boolean" code="KIst" optional="yes">
                 <cocoa key="setTitles" />
             </parameter>
-            <parameter name="master" type="master slide" code="KIMs" optional="yes">
+            <parameter name="slide layout" type="slide layout" code="KIMs" optional="yes">
                 <cocoa key="master" />
             </parameter>
         </command>

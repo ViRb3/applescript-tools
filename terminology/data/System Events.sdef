@@ -214,7 +214,17 @@
 			<property name="translucent menu bar" code="mnTr" type="boolean" description="indicates whether the menu bar is translucent">
 				<cocoa key="isMenuBarTranslucent" />
 			</property>
+			<property name="dynamic style" code="dyst" type="dynamic style" description="desktop picture dynamic style">
+				<cocoa key="dynamicStyle" />
+			</property>
 		</class>
+		<enumeration name="dynamic style" code="dyst">
+			<enumerator name="auto" code="atmt" description="automatic (if supported, follows light/dark appearance)" />
+			<enumerator name="dynamic" code="dynm" description="dynamic (if supported, updates desktop picture based on time and/or location)" />
+			<enumerator name="light" code="lite" description="light" />
+			<enumerator name="dark" code="dark" description="dark" />
+			<enumerator name="unknown" code="unk?" description="unknown value" hidden="yes"/>
+		</enumeration>
 	</suite>
 	<suite name="Dock Preferences Suite" code="dpas" description="Terms and Events for controlling the dock preferences">
 		<class-extension extends="application" description="The System Events application">
@@ -229,6 +239,12 @@
 			<property name="dock size" code="dsze" type="real" description="size/height of the items (between 0.0 (minimum) and 1.0 (maximum))">
 				<cocoa key="docksize" />
 			</property>
+			<property name="autohide menu bar" code="dahm" type="boolean" description="is autohiding the menu bar on or off?">
+				<cocoa key="autohideMenuBar" />
+			</property>
+			<property name="double click behavior" code="dbeh" type="dpbh" description="behaviour when double clicking window a title bar">
+				<cocoa key="doubleClickBehavior" />
+			</property>
 			<property name="magnification" code="dmag" type="boolean" description="is magnification on or off?" />
 			<property name="magnification size" code="dmsz" type="real" description="maximum magnification size when magnification is on (between 0.0 (minimum) and 1.0 (maximum))">
 				<cocoa key="magsize" />
@@ -236,8 +252,17 @@
 			<property name="minimize effect" code="deff" type="dpef" description="minimization effect">
 				<cocoa key="effect" />
 			</property>
+			<property name="minimize into application" code="dmia" type="boolean" description="minimize window into its application?">
+				<cocoa key="minimizeIntoApp" />
+			</property>
 			<property name="screen edge" code="dpse" type="dpls" description="location on screen">
 				<cocoa key="edge" />
+			</property>
+			<property name="show indicators" code="dshi" type="boolean" description="show indicators for open applications?">
+				<cocoa key="showIndicators" />
+			</property>
+			<property name="show recents" code="dshr" type="boolean" description="show recent applications?">
+				<cocoa key="showRecents" />
 			</property>
 		</class>
 		<enumeration name="dpls" code="dpls">
@@ -248,6 +273,11 @@
 		<enumeration name="dpef" code="dpef">
 			<enumerator name="genie" code="geni" description="genie" />
 			<enumerator name="scale" code="scal" description="scale" />
+		</enumeration>
+		<enumeration name="dpbh" code="dpbh">
+			<enumerator name="minimize" code="ddmi" description="minimize" />
+			<enumerator name="off" code="ddof" description="off" />
+			<enumerator name="zoom" code="ddzo" description="zoom" />
 		</enumeration>
 	</suite>
 	<suite name="Login Items Suite" code="logi" description="Terms and Events for controlling the Login Items application">
@@ -404,19 +434,6 @@
 			<property name="main screen only" code="mscr" type="boolean" description="should the screen saver be shown only on the main screen?" />
 			<property name="running" code="runn" type="boolean" access="r" description="is the screen saver running?" />
 			<property name="show clock" code="shcl" type="boolean" description="should a clock appear over the screen saver?" />
-		</class>
-	</suite>
-	<suite name="Audio File Suite" code="audz" description="Terms and Events for accessing the content of Audio files">
-		<class-extension extends="application" description="The System Events application">
-			<element type="audio data" />
-			<element type="audio file" />
-		</class-extension>
-		<class name="audio data" code="audd" description="Data in Audio format" inherits="QuickTime data">
-			<cocoa class="AudioData" />
-		</class>
-		<class name="audio file" code="audf" description="A file containing data in Audio format" inherits="QuickTime file" plural="audio files">
-			<cocoa class="AudioFile" />
-			<contents type="audio data" access="r" description="the contents of the audio file; elements and properties of the audio data may be accessed as if they were elements and properties of the audio file" />
 		</class>
 	</suite>
 <!--	-->
@@ -591,9 +608,6 @@
 			<responds-to command="delete">
 				<cocoa method="deleteVerb:" />
 			</responds-to>
-			<responds-to command="do script">
-				<cocoa method="doScript:" />
-			</responds-to>
 			<element type="alias" />
 			<element type="disk item" />
 			<element type="file" />
@@ -700,9 +714,6 @@
 			<responds-to command="move">
 				<cocoa method="move:" />
 			</responds-to>
-			<responds-to command="do script">
-				<cocoa method="doScriptVerb:" />
-			</responds-to>
 			<property name="busy status" code="busy" type="boolean" access="r" description="Is the disk item busy?" />
 			<property name="container" code="ctnr" type="disk item" access="r" description="the folder or disk which has this disk item as an element" />
 			<property name="creation date" code="ascd" type="date" access="r" description="the date on which the disk item was created" />
@@ -783,9 +794,6 @@
 		</class>
 		<class name="file" code="file" description="A file in the file system" inherits="disk item" plural="files">
 			<cocoa class="File" />
-			<responds-to command="do script">
-				<cocoa method="doScript:" />
-			</responds-to>
 			<property name="creator type" code="fcrt" description="the OSType identifying the application that created the file">
 				<type type="text" />
 				<type type="any" />
@@ -906,28 +914,7 @@
 <!--	-->
 
     <xi:include href="file:///System/Library/PrivateFrameworks/FolderActionsKit.framework/Versions/A/Resources/FolderActions.sdef" xpointer="xpointer(/dictionary/suite)"/>
-    
-	<suite name="Movie File Suite" code="movz" description="Terms and Events for accessing the content of Movie files">
-		<class-extension extends="application" description="The System Events application">
-			<element type="movie data" />
-			<element type="movie file" />
-		</class-extension>
-		<class name="movie data" code="movd" description="Data in Movie format" inherits="QuickTime data">
-			<cocoa class="MovieData" />
-			<property name="bounds" code="pbnd" access="r" description="the bounding rectangle of the movie file">
-                <type type="integer" list="yes" />
-            </property>
-			<property name="natural dimensions" code="ndim" access="r" description="the dimensions the movie has when it is not scaled">
-                <type type="integer" list="yes" />
-            </property>
-			<property name="preview duration" code="pvwd" type="integer" access="r" description="the preview duration of the movie file" />
-			<property name="preview time" code="pvwt" type="integer" access="r" description="the preview time of the movie file" />
-		</class>
-		<class name="movie file" code="movf" description="A file containing data in Movie format" inherits="QuickTime file" plural="movie files">
-			<cocoa class="MovieFile" />
-			<contents type="movie data" access="r" description="the contents of the movie file; elements and properties of the movie data may be accessed as if they were elements and properties of the movie file" />
-		</class>
-	</suite>
+
 	<suite name="Power Suite" code="powr" description="Terms and Events for controlling System power">
 		<command name="log out" code="fndrlogo" description="Log out the current user">
 			<cocoa class="LogoutVerb" />
@@ -1749,90 +1736,6 @@
             </contents>
         </class-extension>
 	</suite>
-	<suite name="QuickTime File Suite" code="qtfz" description="Terms and Events for accessing the content of QuickTime files">
-		<class-extension extends="application" description="The System Events application">
-			<element type="QuickTime data" />
-			<element type="QuickTime file" />
-		</class-extension>
-		<class name="annotation" code="anno" description="A unit of user data in a QuickTime file">
-			<cocoa class="sevsQTAnnotation" />
-			<property name="full text" code="anot" type="text" access="r" description="the full text of the annotation" />
-			<property name="id" code="ID  " type="text" access="r" description="the unique identifier of the annotation">
-				<cocoa key="uniqueID" />
-			</property>
-			<property name="name" code="pnam" type="text" access="r" description="the name of the annotation" />
-		</class>
-		<class name="QuickTime data" code="qtfd" description="Data in QuickTime format">
-			<cocoa class="sevsQTData" />
-			<element type="annotation">
-				<cocoa key="qtAnnotations" />
-			</element>
-			<element type="track">
-				<cocoa key="qtTracks" />
-			</element>
-			<property name="auto play" code="autp" type="boolean" access="r" description="will the movie automatically start playing? (saved with QuickTime file)" />
-			<property name="auto present" code="apre" type="boolean" access="r" description="will the movie automatically start presenting? (saved with QuickTime file)" />
-			<property name="auto quit when done" code="aqui" type="boolean" access="r" description="will the player automatically quit when done playing? (saved with QuickTime file)" />
-			<property name="creation time" code="mdcr" type="date" access="r" description="the creation time of the QuickTime file" />
-			<property name="data size" code="dsiz" type="integer" access="r" description="the size of the QuickTime file data" />
-			<property name="duration" code="durn" type="integer" access="r" description="the duration of the QuickTime file, in terms of the time scale" />
-			<property name="href" code="href" type="text" access="r" description="the internet location to open when clicking on the movie (overrides track hrefs)" />
-			<property name="looping" code="loop" type="boolean" access="r" description="keep playing the movie in a loop?" />
-			<property name="modification time" code="mdtm" type="date" access="r" description="the modification time of the QuickTime file" />
-			<property name="preferred rate" code="prfr" type="integer" access="r" description="the preferred rate of the QuickTime file" />
-			<property name="preferred volume" code="prfv" type="integer" access="r" description="the preferred volume of the QuickTime file" />
-			<property name="presentation mode" code="prmd" type="prmd" access="r" description="mode in which the movie will be presented" />
-			<property name="presentation size" code="mvsz" type="mvsz" access="r" description="size at which the movie will be presented">
-                <synonym code="prsz" />
-            </property>
-			<property name="stored stream" code="isss" type="boolean" access="r" description="is this a stored streaming movie?" />
-			<property name="time scale" code="tmsc" type="integer" access="r" description="the time scale of the QuickTime file" />
-		</class>
-		<class name="QuickTime file" code="qtff" description="A file containing data in QuickTime format" inherits="file" plural="QuickTime files">
-			<cocoa class="sevsQTFile" />
-			<contents type="QuickTime data" access="r" description="the contents of the QuickTime file; elements and properties of the QuickTime data may be accessed as if they were elements and properties of the QuickTime file" />
-		</class>
-		<class name="track" code="trak" description="A track in a QuickTime file" plural="tracks">
-			<cocoa class="sevsQTTrack" />
-			<element type="annotation">
-				<cocoa key="qtAnnotations" />
-			</element>
-			<property name="audio channel count" code="acha" type="integer" access="r" description="the number of channels in the audio" />
-			<property name="audio characteristic" code="audi" type="boolean" access="r" description="can the track be heard?" />
-			<property name="audio sample rate" code="asra" type="real" access="r" description="the sample rate of the audio in kHz" />
-			<property name="audio sample size" code="assz" type="integer" access="r" description="the size of uncompressed audio samples in bits" />
-			<property name="creation time" code="mdcr" type="date" access="r" description="the creation time of the track" />
-			<property name="data format" code="tdfr" type="text" access="r" description="the data format" />
-			<property name="data rate" code="ddra" type="integer" access="r" description="the data rate (bytes/sec) of the track" />
-			<property name="data size" code="dsiz" type="integer" access="r" description="the size of the track data" />
-			<property name="dimensions" code="pdim" access="r" description="the current dimensions of the track">
-				<type type="number" list="yes" />
-			</property>
-			<property name="duration" code="durn" type="integer" access="r" description="the duration of the track, in terms of the time scale" />
-			<property name="enabled" code="enaB" type="boolean" description="should this track be used when the movie is playing?" />
-			<property name="high quality" code="hqua" type="boolean" description="is the track high quality?" />
-			<property name="href" code="href" type="text" access="r" description="the internet location to open when clicking on the track" />
-			<property name="kind" code="kind" type="text" access="r" description="the name of the media in the track, in the current language (e.g., &apos;Sound&apos;, &apos;Video&apos;, &apos;Text&apos;, ...)" />
-			<property name="modification time" code="mdtm" type="date" access="r" description="the modification time of the track" />
-			<property name="name" code="pnam" type="text" access="r" description="the name of the track" />
-			<property name="start time" code="offs" type="integer" description="the time delay before this track starts playing" />
-			<property name="type" code="ptyp" type="text" access="r" description="the type of media in the track (e.g., &apos;soun&apos;, &apos;vide&apos;, &apos;text&apos;, ...)" />
-			<property name="type class" code="type" type="text" access="r" description="deprecated: use &quot;type&quot; instead ( included only to resolve a terminology conflict, script text will be updated upon compilation )" />
-			<property name="video depth" code="vcdp" type="integer" access="r" description="the color depth of the video" />
-			<property name="visual characteristic" code="visu" type="boolean" access="r" description="can the track be seen?" />
-		</class>
-		<enumeration name="prmd" code="prmd">
-			<enumerator name="normal" code="norm" description="normal" />
-			<enumerator name="slide show" code="pmss" description="slide show" />
-		</enumeration>
-		<enumeration name="mvsz" code="mvsz">
-			<enumerator name="current" code="cust" description="current" />
-			<enumerator name="double" code="doub" description="double" />
-			<enumerator name="half" code="half" description="half" />
-			<enumerator name="normal" code="norm" description="normal" />
-			<enumerator name="screen" code="fits" description="screen" />
-		</enumeration>
-	</suite>
 	<suite name="XML Suite" code="xmlz" description="Terms and Events for accessing the content of XML files">
 		<class-extension extends="application" description="The System Events application">
 			<element type="XML data">
@@ -1971,15 +1874,6 @@
 				<cocoa key="windowSize" />
 			</parameter>
 		</command>
-		<command name="do script" code="miscdosc" description="Execute an OSA script." hidden="yes">
-			<cocoa class="DoScriptVerb" />
-			<direct-parameter description="the object for the command">
-				<type type="alias" />
-				<type type="file" />
-				<type type="text" />
-			</direct-parameter>
-			<result type="any" />
-		</command>
 		<command name="edit action of" code="facoedfa" description="Edit an action of a folder" hidden="yes">
             <cocoa class="EditActionVerb" />
 			<direct-parameter type="specifier" description="the object for the command" />
@@ -1997,11 +1891,21 @@
 		</command>
 		<command name="key down" code="prcskeyF" description="cause the target process to behave as if keys were held down" hidden="yes">
             <cocoa class="KeyDownVerb" />
-			<direct-parameter type="any" description="the object for the command" />
+			<direct-parameter description="a keystroke, key code, or (list of) modifier key names.">
+				<type type="text" />
+				<type type="integer" />
+				<type type="eMky" />
+				<type type="eMky" list="yes" />
+			</direct-parameter>
 		</command>
 		<command name="key up" code="prcskeyU" description="cause the target process to behave as if keys were released" hidden="yes">
             <cocoa class="KeyUpVerb" />
-			<direct-parameter type="any" description="the object for the command" />
+			<direct-parameter description="a keystroke, key code, or (list of) modifier key names.">
+				<type type="text" />
+				<type type="integer" />
+				<type type="eMky" />
+				<type type="eMky" list="yes" />
+			</direct-parameter>
 		</command>
 		<command name="pick" code="prcspick" description="cause the target process to behave as if the UI element were picked" hidden="yes">
 			<direct-parameter type="specifier" description="the object for the command" />

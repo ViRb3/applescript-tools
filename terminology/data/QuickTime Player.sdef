@@ -79,9 +79,6 @@
 		</command>
 		<command name="new screen recording" code="MVWRnscr" description="Create a new screen recording document.">
 			<cocoa class="NSScriptCommand"/>
-			<result description="The new screen recording document.">
-				<type type="document"/>
-			</result>
 		</command>
 		<command name="export" code="MVWRexpo" description="Export a movie to another file">
 			<cocoa class="NSScriptCommand"/>

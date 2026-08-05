@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {"name":"Calendar","bundle_id":"com.apple.iCal","paths":["/System/Applications/Calendar.app"]},
+    {"name":"Contacts","bundle_id":"com.apple.AddressBook","paths":["/System/Applications/Contacts.app"]},
+    {"name":"Database Events","bundle_id":"com.apple.databaseevents","paths":["/System/Library/CoreServices/Database Events.app"]},
+    {"name":"Finder","bundle_id":"com.apple.finder","paths":["/System/Library/CoreServices/Finder.app"]},
+    {"name":"Image Events","bundle_id":"com.apple.imageevents","paths":["/System/Library/CoreServices/Image Events.app"]},
+    {"name":"Keynote","bundle_id":"com.apple.iWork.Keynote","paths":["/Applications/Keynote.app"]},
+    {"name":"Mail","bundle_id":"com.apple.mail","paths":["/System/Applications/Mail.app"]},
+    {"name":"Messages","bundle_id":"com.apple.MobileSMS","paths":["/System/Applications/Messages.app"]},
+    {"name":"Music","bundle_id":"com.apple.Music","paths":["/System/Applications/Music.app"]},
+    {"name":"Notes","bundle_id":"com.apple.Notes","paths":["/System/Applications/Notes.app"]},
+    {"name":"Numbers","bundle_id":"com.apple.iWork.Numbers","paths":["/Applications/Numbers.app"]},
+    {"name":"Pages","bundle_id":"com.apple.iWork.Pages","paths":["/Applications/Pages.app"]},
+    {"name":"Photos","bundle_id":"com.apple.Photos","paths":["/System/Applications/Photos.app"]},
+    {"name":"QuickTime Player","bundle_id":"com.apple.QuickTimePlayerX","paths":["/System/Applications/QuickTime Player.app"]},
+    {"name":"Reminders","bundle_id":"com.apple.reminders","paths":["/System/Applications/Reminders.app"]},
+    {"name":"Safari","bundle_id":"com.apple.Safari","paths":["/Applications/Safari.app","/System/Applications/Safari.app"]},
+    {"name":"Script Editor","bundle_id":"com.apple.ScriptEditor2","paths":["/System/Applications/Utilities/Script Editor.app"]},
+    {"name":"SpeechRecognitionServer","bundle_id":"com.apple.speech.SpeechRecognitionServer","paths":["/System/Library/PrivateFrameworks/SpeechObjects.framework/Versions/A/SpeechRecognitionServer.app"]},
+    {"name":"StandardAdditions","bundle_id":"com.apple.osax.standardadditions","paths":["/System/Library/ScriptingAdditions/StandardAdditions.osax"]},
+    {"name":"System Events","bundle_id":"com.apple.systemevents","paths":["/System/Library/CoreServices/System Events.app"]},
+    {"name":"System Settings","bundle_id":"com.apple.systempreferences","paths":["/System/Applications/System Settings.app"]},
+    {"name":"Terminal","bundle_id":"com.apple.Terminal","paths":["/System/Applications/Utilities/Terminal.app"]},
+    {"name":"TextEdit","bundle_id":"com.apple.TextEdit","paths":["/System/Applications/TextEdit.app"]},
+    {"name":"VoiceOver","bundle_id":"com.apple.VoiceOver","paths":["/System/Library/CoreServices/VoiceOver.app"]}
+  ]
+}

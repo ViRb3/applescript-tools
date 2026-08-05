@@ -15,8 +15,31 @@
 			<cocoa class="ICOpenNoteCommand"/>
 		</command>
 		
+		<command name="show" code="noteshow" description="Show an object in the UI">
+			<direct-parameter description="The object to be shown">
+				<type type="account"/>
+				<type type="folder"/>
+				<type type="note"/>
+				<type type="attachment"/>
+			</direct-parameter>
+			<parameter name="separately" code="sepa" type="boolean" optional="yes"/>
+			<result description="The object shown.">
+				<type type="account"/>
+				<type type="folder"/>
+				<type type="note"/>
+				<type type="attachment"/>
+			</result>
+		</command>
+		
 		<class-extension extends="application" description="the Notes application">
 			<cocoa class="NSApplication"/>
+			<property name="default account" code="dfac" type="account" description="the default account for creating notes">
+				<cocoa key="scriptingDefaultAccount"/>
+			</property>
+			<property name="selection" code="seln" description="the selected note(s)">
+				<type type="note" list="yes"/>
+				<cocoa key="scriptingSelection"/>
+			</property>
 			<element type="account">
 				<cocoa key="scriptingAccounts" insert-at-beginning="yes"/>
 			</element>
@@ -33,11 +56,23 @@
 		
 		<class name="account" code="acct" description="a Notes account">
 			<cocoa class="ICScriptingAccount"/>
+			<responds-to command="show">
+				<cocoa method="handleShowScriptCommand:"/>
+			</responds-to>
+			<property name="default folder" code="dfol" type="folder" description="the default folder for creating notes">
+				<cocoa key="scriptingDefaultFolder"/>
+			</property>
 			<element type="folder">
 				<cocoa key="scriptingFolders" insert-at-beginning="yes"/>
 			</element>
+			<element type="note">
+				<cocoa key="scriptingNotes" insert-at-beginning="yes"/>
+			</element>
 			<property name="name" code="pnam" type="text" description="the name of the account">
 				<cocoa key="accountDescription"/>
+			</property>
+			<property name="upgraded" code="upgr" type="boolean" access="r" description="Is the account upgraded?">
+				<cocoa key="isUpgraded"/>
 			</property>
 			<property name="id" code="ID  " type="text" access="r" description="the unique identifier of the account">
 				<cocoa key="scriptingID"/>
@@ -47,6 +82,9 @@
 		<class name="folder" code="cfol" description="a folder containing notes">
 			<synonym code="asdr"/>
 			<cocoa class="ICScriptingFolder"/>
+			<responds-to command="show">
+				<cocoa method="handleShowScriptCommand:"/>
+			</responds-to>
 			<element type="folder">
 				<cocoa key="scriptingFolders" insert-at-beginning="yes"/>
 			</element>
@@ -54,10 +92,13 @@
 				<cocoa key="scriptingNotes" insert-at-beginning="yes"/>
 			</element>
 			<property name="name" code="pnam" type="text" description="the name of the folder">
-                <cocoa key="title"/>
+				<cocoa key="scriptingName"/>
             </property>
 			<property name="id" code="ID  " type="text" access="r" description="the unique identifier of the folder">
 				<cocoa key="scriptingID"/>
+			</property>
+			<property name="shared" code="shrd" type="boolean" access="r" description="Is the folder shared?">
+				<cocoa key="isShared"/>
 			</property>
 			<property name="container" code="cntr" access="r" description="the container of the folder">
 				<cocoa key="scriptingContainer"/>
@@ -68,6 +109,9 @@
 		
 		<class name="note" code="note" description="a note in the Notes application">
 			<cocoa class="ICScriptingNote"/>
+			<responds-to command="show">
+				<cocoa method="handleShowScriptCommand:"/>
+			</responds-to>
 			<element type="attachment">
 				<cocoa key="scriptingAttachments" insert-at-beginning="yes"/>
 			</element>
@@ -81,16 +125,28 @@
 			<property name="body" code="body" type="text" description="the HTML content of the note">
 				<cocoa key="scriptingBody"/>
 			</property>
+			<property name="plaintext" code="text" type="text" access="r" description="the plaintext content of the note">
+				<cocoa key="scriptingPlainText"/>
+			</property>
 			<property name="creation date" code="ascd" type="date" access="r" description="the creation date of the note">
 				<cocoa key="creationDate"/>
 			</property>
 			<property name="modification date" code="asmo" type="date" access="r" description="the modification date of the note">
 				<cocoa key="modificationDate"/>
 			</property>
+			<property name="password protected" code="pwpr" type="boolean" access="r" description="Is the note password protected?">
+				<cocoa key="isPasswordProtected"/>
+			</property>
+			<property name="shared" code="shrd" type="boolean" access="r" description="Is the note shared?">
+				<cocoa key="isShared"/>
+			</property>
 		</class>
 		
 		<class name="attachment" code="atts" description="an attachment in a note">
 			<cocoa class="ICScriptingAttachment"/>
+			<responds-to command="show">
+				<cocoa method="handleShowScriptCommand:"/>
+			</responds-to>
 			<property name="name" code="pnam" type="text" access="r" description="the name of the attachment">
 				<cocoa key="filename"/>
 			</property>
@@ -103,11 +159,23 @@
 			<property name="content identifier" code="cid " type="text" access="r" description="the content-id URL in the note's HTML">
 				<cocoa key="scriptingCID"/>
 			</property>
+			<property name="creation date" code="ascd" type="date" access="r" description="the creation date of the attachment">
+				<cocoa key="scriptingCreationDate"/>
+			</property>
+			<property name="modification date" code="asmo" type="date" access="r" description="the modification date of the attachment">
+				<cocoa key="scriptingModificationDate"/>
+			</property>
+			<property name="URL" code="URL " type="text" access="r" description="for URL attachments, the URL the attachment represents">
+				<cocoa key="scriptingURL"/>
+			</property>
+			<property name="shared" code="shrd" type="boolean" access="r" description="Is the attachment shared?">
+				<cocoa key="isShared"/>
+			</property>
 			<!--
 				It might seem a little weird to have a hidden contents property. We do this to facilitate creating
 				an attachment like this: "make new attachment with data myFile". Internally we copy the file to a
 				private location, and we don't want to expose that location in the scripting interface, hence we
-				hide the contents and implement scriptingContents to return an error.
+				hide the contents.
 			-->
 			<contents type="file" hidden="yes">
 				<cocoa key="scriptingContents"/>

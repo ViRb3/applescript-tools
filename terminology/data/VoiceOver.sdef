@@ -22,12 +22,12 @@
                 <cocoa key="keyboardCursor"/>
             </property>
             
-            <property name="caption panel" code="capa" access="r" type="caption panel object" description="The VoiceOver caption panel">
-                <cocoa key="captionPanel"/>
+            <property name="caption window" code="capa" access="r" type="caption window object" description="The VoiceOver caption window">
+                <cocoa key="captionWindow"/>
             </property>
             
-            <property name="braille panel" code="brpa" access="r" type="braille panel object" description="The VoiceOver braille panel">
-                <cocoa key="braillePanel"/>
+            <property name="braille window" code="brpa" access="r" type="braille window object" description="The VoiceOver Braille window">
+                <cocoa key="brailleWindow"/>
             </property>
             
             <property name="last phrase" code="lapr" access="r" type="last phrase object" description="The last phrase VoiceOver output">
@@ -81,34 +81,18 @@
                 <cocoa method="appleScriptHandlePerformCommand:"/>
             </responds-to>
         </class>
-
-
-        <class name="caption panel object" code="capO" description="The caption panel">
-            <cocoa class="SCRAppleScriptCaptionPanel"/>            
-            <property name="rows" code="rows" access="rw" type="integer" description="The number of rows">
-                <cocoa key="rows"/>
-            </property>
-            <property name="size" code="size" access="rw" type="integer" description="The size">
-                <cocoa key="size"/>
-            </property>
-            <property name="visible" code="pvis" access="rw" type="boolean" description="The visibility of the panel">
-                <cocoa key="visible"/>
-            </property>
-            <property name="position" code="ppos" access="rw" type="point" description="The location of the panel">
-                <cocoa key="position"/>
+        
+        <class name="caption window object" code="capO" description="The caption window">
+            <cocoa class="SCRAppleScriptCaptionWindow"/>
+            <property name="enabled" code="cwon" access="rw" type="boolean" description="The visibility of the caption window">
+                <cocoa key="enabled"/>
             </property>
         </class>
 
-        <class name="braille panel object" code="brpO" description="The braille panel">
-            <cocoa class="SCRAppleScriptBraillePanel"/>            
-            <property name="size" access="rw" code="size" type="integer" description="The size">
-                <cocoa key="size"/>
-            </property>
-            <property name="visible" access="rw" code="pvis" type="boolean" description="The visibility of the panel">
-                <cocoa key="visible"/>
-            </property>
-            <property name="position" code="ppos" access="rw" type="point" description="The location of the panel">
-                <cocoa key="position"/>
+        <class name="braille window object" code="brpO" description="The Braille window">
+            <cocoa class="SCRAppleScriptBrailleWindow"/>
+            <property name="enabled" code="pvis" access="rw" type="boolean" description="The visibility of the Braille window">
+                <cocoa key="enabled"/>
             </property>
         </class>
 
@@ -251,7 +235,7 @@
             <enumerator name="dock" code="docV" description="The dock"/>
             <enumerator name="desktop" code="desV" description="The desktop"/>
             <enumerator name="menubar" code="menV" description="The menubar"/>
-            <enumerator name="menu extras" code="meeV" description="Menu extras"/>
+            <enumerator name="status menu" code="meeV" description="Status menu"/>
             <enumerator name="spotlight" code="spoV" description="Spotlight"/>
             <enumerator name="linked item" code="linV" description="Linked item"/>
             <enumerator name="first item" code="FirV" description="First item"/>
@@ -291,7 +275,7 @@
             <enumerator name="workspace overview" code="worS" description="The overview of the working environment"/>    
             <enumerator name="window overview" code="winO" description="The overview of the current window"/>    
             <enumerator name="web overview" code="webO" description="The overview of the web page"/>    
-            <enumerator name="announcement history" code="annH" description="Causes the Braille display to show recent announcement"/>
+            <enumerator name="announcement history" code="annH" description="Causes the display to show recent announcement"/>
         </enumeration>
 
         <enumeration name="spelling type" code="spel">

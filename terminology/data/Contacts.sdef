@@ -20,13 +20,13 @@
 			<result type="specifier" description="The new object."/>
 		</command>
     </suite>
-	<suite name="Address Book Script Suite" code="az00" description="commands and classes for Address Book scripting.">
+	<suite name="Contacts Script Suite" code="az00" description="commands and classes for Contacts scripting.">
 		<class-extension extends="application">
 			<cocoa class="NSApplication" />
-			<property type="person" name="my card" code="az54" description="Returns my Address Book card.">
+			<property type="person" name="my card" code="az54" description="Returns my Contacts card.">
 				<cocoa key="meCard" />
 			</property>
-			<property type="boolean" name="unsaved" code="azf2" access="r" description="Does Address Book have any unsaved changes?">
+			<property type="boolean" name="unsaved" code="azf2" access="r" description="Does Contacts have any unsaved changes?">
 				<cocoa key="hasUnsavedChanges" />
 			</property>
 			<property name="selection" code="az48" description="Currently selected entries">
@@ -52,7 +52,7 @@
 			<cocoa class="NSData" />
 		</value-type>
 		<enumeration name="saveable file format" code="savf">
-			<enumerator name="archive" code="abbu" description="The native Address Book file format">
+			<enumerator name="archive" code="abbu" description="The native Contacts file format">
 				<cocoa string-value="com.apple.AddressBook.archive"/>
 			</enumerator>
 		</enumeration>
@@ -280,7 +280,7 @@
 				<type type="TIFF picture" />
 				<type type="missing value" />
 			</property>
-			<property name="name" code="pnam" access="r" description="First/Last name of the person, uses the name display order preference setting in Address Book.">
+			<property name="name" code="pnam" access="r" description="First/Last name of the person, uses the name display order preference setting in Contacts.">
 				<cocoa key="name" />
 				<type type="text" />
 			</property>
@@ -421,14 +421,14 @@
 			</parameter>
 			<result type="person" />
 		</command>
-		<command name="save" code="coresave" description="Save all Address Book changes. Also see the unsaved property for the application class.">
+		<command name="save" code="coresave" description="Save all Contacts changes. Also see the unsaved property for the application class.">
 			<synonym name="save addressbook"/>
 			<synonym code="az00az15"/>
 			<cocoa name="Save" />
 			<result type="any" />
 		</command>
 	</suite>
-	<suite name="Address Book Rollover Suite" code="az99" description="These event definitions are used for constructing Address Book Rollover plug-ins. They would not normally appear in a typical end user script.">
+	<suite name="Address Book Rollover Suite" code="az99" hidden="yes" description="These event definitions are used for constructing Address Book Rollover plug-ins. They would not normally appear in a typical end user script.">
 		<command name="action property" code="az00az57" description="RollOver - Which property this roll over is associated with (Properties can be one of maiden name, phone, email, url, birth date, custom date, related name, aim, icq, jabber, msn, yahoo, address.)">
 			<cocoa name="ActionProperty" />
 			<result type="text" />

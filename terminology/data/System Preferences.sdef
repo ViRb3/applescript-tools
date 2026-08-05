@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE dictionary SYSTEM "file://localhost/System/Library/DTDs/sdef.dtd">
-<dictionary>
-    <suite name="System Preferences" code="xppb">
-        <class name="pane" code="xppb">
-            <property name="current pane" code="xpcp" type="pane" access="rw"/>
-        </class>
-    </suite>
-</dictionary>

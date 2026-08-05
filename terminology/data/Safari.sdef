@@ -70,6 +70,9 @@
             <responds-to command="search the web">
                 <cocoa method="handleSearchTheWebCommand:"/>
             </responds-to>
+            <property type="number" name="pid" code="wpid" access="r" description="The pid of the WebContent process backing the tab, if it exists." hidden="yes">
+                <cocoa key="webProcessIdentifier"/>
+            </property>
         </class>
 
         <class code="srcP" name="sourceProvider" hidden="yes">
@@ -143,6 +146,18 @@
             <cocoa class="DispatchMessageToExtension"/>
             <access-group identifier="com.apple.Safari.dispatch-message-to-extension"/>
             <direct-parameter type="any" description="A dictionary describing the message"/>
+        </command>
+
+        <command name="sync all plist to disk" code="sfriplst" hidden="yes" description="Make sure that all in-memory structures are in-sync with their on-disk counterparts.">
+            <access-group identifier="com.apple.private.Safari.sync-plist"/>
+        </command>
+
+        <command name="show privacy report" code="sfripvrp" hidden="yes" description="Show Safari's Privacy Report">
+            <cocoa class="ShowPrivacyReport"/>
+        </command>
+
+        <command name="show credit card settings" code="sfrisccs" hidden="yes" description="Show Safari Credit Card Settings.">
+            <cocoa class="ShowCreditCardSettings"/>
         </command>
 
     </suite>

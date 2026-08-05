@@ -204,8 +204,8 @@
 			</responds-to>
 		</class> 
 		<class name="window" code="cwin" description="A window."> 
-			<cocoa class="NSWindow"/> 
-			<property name="name" code="pnam" type="text" access="r" 
+			<cocoa class="TTWindow"/>
+			<property name="name" code="pnam" type="text" access="r"
 				description="The full title of the window."> 
 				<cocoa key="title"/> 
 			</property> 

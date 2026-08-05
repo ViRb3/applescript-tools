@@ -481,7 +481,7 @@
 		</class>
 		
 		<class name="signature" code="situ" description="Email signatures">
-			<cocoa class="Signature"/>
+			<cocoa class="MFSignature"/>
 			<access-group identifier="com.apple.mail.compose" access="r"/>
 			<property name="content" code="ctnt" type="text" description="Contents of email signature. If there is a version with fonts and/or styles, that will be returned over the plain text version">
 				<cocoa key="signatureContents"/>
@@ -590,7 +590,7 @@
 				<cocoa key="isRead"/>
 			</property>
 			<property name="message id" code="meid" type="text" access="r" description="The unique message ID string">
-				<cocoa key="messageIDHeader"/>
+				<cocoa key="scriptedMessageIDHeader"/>
 			</property>
 			<property name="source" code="raso" type="text" access="r" description="Raw source of the message">
 				<cocoa key="rawSource"/>
@@ -600,7 +600,9 @@
 				<cocoa key="scriptedMessageSize"/>
 			</property>
 			<property name="sender" code="sndr" type="text" access="r" description="The sender of the message"/>
-			<property name="subject" code="subj" type="text" access="r" description="The subject of the message"/>
+			<property name="subject" code="subj" type="text" access="r" description="The subject of the message">
+				<cocoa key="subjectString"/>
+			</property>
 			<property name="was forwarded" code="isfw" type="boolean" access="r" description="Indicates whether the message was forwarded or not"/>
 			<property name="was redirected" code="isrc" type="boolean" access="r" description="Indicates whether the message was redirected or not"/>
 			<property name="was replied to" code="isrp" type="boolean" access="r" description="Indicates whether the message was replied to or not"/>

@@ -120,6 +120,7 @@
 			<direct-parameter type="specifier" optional="yes" description="the disk(s) to eject"/>
 		</command>
 		<command name="empty" code="fndrempt" description="Empty the trash">
+			<access-group identifier="com.apple.finder.trash"/>
 			<direct-parameter type="specifier" optional="yes" description="“empty” and “empty trash” both do the same thing"/>
 			<parameter name="security" code="sec?" type="boolean" optional="yes" description="(obsolete)"/>
 		</command>
@@ -155,7 +156,7 @@
 			<property name="creation date" code="ascd" type="date" access="r" description="the date on which the item was created"/>
 			<property name="modification date" code="asmo" type="date" description="the date on which the item was last modified"/>
 			<property name="icon" code="iimg" type="icon family" description="the icon bitmap of the item"/>
-			<property name="url" code="purl" type="text" access="r" description="the URL of the item"/>
+			<property name="URL" code="pURL" type="text" access="r" description="the URL of the item"/>
 			<property name="owner" code="sown" type="text" description="the user that owns the container"/>
 			<property name="group" code="sgrp" type="text" description="the user or group that has special access to the container"/>
 			<property name="owner privileges" code="ownr" type="priv"/>
@@ -270,6 +271,9 @@
 			<enumerator name="FTP format" code="dfft"/>
 			<enumerator name="Packet written UDF format" code="dfpu"/>
 			<enumerator name="Xsan format" code="dfac"/>
+			<enumerator name="APFS format" code="dfap"/>
+			<enumerator name="ExFAT format" code="dfxf"/>
+			<enumerator name="SMB format" code="dfsm"/>
 			<enumerator name="unknown format" code="df??"/>
 		</enumeration>
 	</suite>
@@ -306,7 +310,7 @@
 
 	<suite name="Window classes" code="fndr" description="Classes representing windows">
 		<class name="window" code="cwin" description="A window" plural="windows">
-			<property name="id" code="ID  " type="unsigned integer" access="r" description="the unique id for this window"/>
+			<property name="id" code="ID  " type="integer" access="r" description="the unique id for this window"/>
 			<property name="position" code="posn" type="point" description="the upper left position of the window"/>
 			<property name="bounds" code="pbnd" type="rectangle" description="the boundary rectangle for the window"/>
 			<property name="titled" code="ptit" type="boolean" access="r" description="Does the window have a title bar?"/>
@@ -330,6 +334,7 @@
 			<property name="column view options" code="cvop" type="column view options" access="r" description="the column view options for the container window"/>
 			<property name="toolbar visible" code="tbvi" type="boolean" description="Is the window's toolbar visible?"/>
 			<property name="statusbar visible" code="stvi" type="boolean" description="Is the window's status bar visible?"/>
+			<property name="pathbar visible" code="pbvi" type="boolean" description="Is the window's path bar visible?"/>
 			<property name="sidebar width" code="sbwi" type="integer" description="the width of the sidebar for the container window"/>
 		</class>
 		<class name="desktop window" code="dktw" description="the desktop window" inherits="Finder window"/>
@@ -366,7 +371,7 @@
 			<enumerator name="icon view" code="icnv"/>
 			<enumerator name="list view" code="lsvw"/>
 			<enumerator name="column view" code="clvw"/>
-			<enumerator name="group view" code="grvw"/>
+			<enumerator name="group view" code="flvw"/>
 			<enumerator name="flow view" code="flvw"/>
 		</enumeration>
 	</suite>

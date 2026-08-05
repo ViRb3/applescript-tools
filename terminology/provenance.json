@@ -1,0 +1,203 @@
+{
+  "schema_version": 2,
+  "host": {
+    "product_version": "26.6",
+    "build_version": "25G72",
+    "architecture": "arm64",
+    "sdef_path": "/usr/bin/sdef"
+  },
+  "entries": [
+    {
+      "name": "Calendar",
+      "path": "/System/Applications/Calendar.app",
+      "bundle_id": "com.apple.iCal",
+      "bundle_version": "16.0",
+      "sha256": "b23e388230e57913105c51ffb9d3947b665b17837f276b71b66fb6235fd3a6b8",
+      "semantic_sha256": "5b4eb37822686e10e860c641676e4ed3398f1529f8f0ad43e307ad0b13339808"
+    },
+    {
+      "name": "Contacts",
+      "path": "/System/Applications/Contacts.app",
+      "bundle_id": "com.apple.AddressBook",
+      "bundle_version": "14.0",
+      "sha256": "1483870ceef1ad33972e80b3b6e186c2a8a5f7e0128d5e304e665e601a3992a3",
+      "semantic_sha256": "8c62d30ebd66c8c633dd8c3721cbd0fa449ddcdcf0e2d38f603d116643fed757"
+    },
+    {
+      "name": "Database Events",
+      "path": "/System/Library/CoreServices/Database Events.app",
+      "bundle_id": "com.apple.databaseevents",
+      "bundle_version": "1.0.6",
+      "sha256": "92dbae083d51e6bbdeafed666275cf85cbebf5c20c4fcd88ce60d001da7a2886",
+      "semantic_sha256": "335445cd7c01fa1ce3d134a6116a19c67fa191eef92ddd94933c5f3a273ec1b9"
+    },
+    {
+      "name": "Finder",
+      "path": "/System/Library/CoreServices/Finder.app",
+      "bundle_id": "com.apple.finder",
+      "bundle_version": "26.4",
+      "sha256": "b5f7a14ae310826af7e26de5a433fe1a11627a0bfb409cdcdc6fbe32e144339a",
+      "semantic_sha256": "e414f24a8503949c765ce80a87b03bbcb653e01fc4d5c955c47432f52452b2a9"
+    },
+    {
+      "name": "Image Events",
+      "path": "/System/Library/CoreServices/Image Events.app",
+      "bundle_id": "com.apple.imageevents",
+      "bundle_version": "1.1.6",
+      "sha256": "36e357467dc67d08c064bfa906de9c4cc885c5ea2bd93db69a30d2570882f8cb",
+      "semantic_sha256": "a9f2c1d8963a11ca6604dba8f4edc7c0583693c223c1d88210c8e5febffe2bb8"
+    },
+    {
+      "name": "Keynote",
+      "path": "/Applications/Keynote.app",
+      "bundle_id": "com.apple.iWork.Keynote",
+      "bundle_version": "14.5",
+      "sha256": "312b8fb57cf06549a1be69c39e91afb48d7fcf8f3a0553ebc02289953c2d16d8",
+      "semantic_sha256": "c79f0ed34d87a79b9efe05eea1de2a4c517ebf0ef6bac002b0b123560a277c03"
+    },
+    {
+      "name": "Mail",
+      "path": "/System/Applications/Mail.app",
+      "bundle_id": "com.apple.mail",
+      "bundle_version": "16.0",
+      "sha256": "111b9291c502354106a320f6ba0a7e38ed29f09e443404679fb57778708b0722",
+      "semantic_sha256": "7054b16c9021545b702ec2d1c639857c5eeac5a580448d750550064346c8b745"
+    },
+    {
+      "name": "Messages",
+      "path": "/System/Applications/Messages.app",
+      "bundle_id": "com.apple.MobileSMS",
+      "bundle_version": "26.0",
+      "sha256": "a9db9b015709c8c8e92a8bdccf08984635d5c3545f670bcd0e5a3a10bd5f9e4e",
+      "semantic_sha256": "58067c81be641b8a51ace73ee9871ad5218e4b4126d41ded5fe1c176244bc153"
+    },
+    {
+      "name": "Music",
+      "path": "/System/Applications/Music.app",
+      "bundle_id": "com.apple.Music",
+      "bundle_version": "1.6.6",
+      "sha256": "ebc83706f8b3b5b2db66dd0adcaac96abaad5fdd2c67b1c2fe185d510f65e664",
+      "semantic_sha256": "fa1f239b012e96178c48c7aed8bce1d47a2244b6b5c66e6e94796d47ec755962"
+    },
+    {
+      "name": "Notes",
+      "path": "/System/Applications/Notes.app",
+      "bundle_id": "com.apple.Notes",
+      "bundle_version": "4.13",
+      "sha256": "2485c3e87dbfa0baf09fcfa6d2f6b2c16e4eccc1371db01a2ab8c3d35ef4e65d",
+      "semantic_sha256": "f26f82573240e96b011d450a1b8759de92ecce9ff1d6000fea32f9c415047bf3"
+    },
+    {
+      "name": "Numbers",
+      "path": "/Applications/Numbers.app",
+      "bundle_id": "com.apple.iWork.Numbers",
+      "bundle_version": "14.5",
+      "sha256": "ee098803afeec84afa58bc37bff97115eb5c5bac07d14d9fbff27ee16e3e1d9b",
+      "semantic_sha256": "5dfc8d7c35143c950595ff3ecb87f360a5ab5c19ade152333e28b56c342af6f6"
+    },
+    {
+      "name": "Pages",
+      "path": "/Applications/Pages.app",
+      "bundle_id": "com.apple.iWork.Pages",
+      "bundle_version": "14.5",
+      "sha256": "412e6fb4959ad8486e4d8ce0a5ce93de22a3cdbfb460e7fd21d87000ed860fb3",
+      "semantic_sha256": "3b1f5c7177a07200e836da8e5d18615eadab957e9c46e8551312703b6bc8e810"
+    },
+    {
+      "name": "Photos",
+      "path": "/System/Applications/Photos.app",
+      "bundle_id": "com.apple.Photos",
+      "bundle_version": "11.0",
+      "sha256": "821bd81909c2d19f6a26f125a4dc7b3d42bc44928fee535b25ede9003a44c121",
+      "semantic_sha256": "a7f45e9a28f83726cbcd3e4b409393571903b609c1a2e8248820f78cd66749f7"
+    },
+    {
+      "name": "QuickTime Player",
+      "path": "/System/Applications/QuickTime Player.app",
+      "bundle_id": "com.apple.QuickTimePlayerX",
+      "bundle_version": "10.5",
+      "sha256": "d6afad16ae3c849e046cf7a42ed7f813db9fdec2578458e2371aff18cc6d24f3",
+      "semantic_sha256": "6ad34d4c497204dd903d8075b33e4084d70e98da244cf3f56936944f239bc048"
+    },
+    {
+      "name": "Reminders",
+      "path": "/System/Applications/Reminders.app",
+      "bundle_id": "com.apple.reminders",
+      "bundle_version": "7.0",
+      "sha256": "6794cc7e63d43f20bf40e0afc029ed6ef865260b1317ad0d7e52b774d0e0b82c",
+      "semantic_sha256": "a2417d0af96a58966d0ce1e86b83f536c3640d86fd8619678fbe732acff326ee"
+    },
+    {
+      "name": "Safari",
+      "path": "/Applications/Safari.app",
+      "bundle_id": "com.apple.Safari",
+      "bundle_version": "26.6",
+      "sha256": "a0a05c6e4a37f30e78545c3e715d57facd6217864b252bcd07fbfd579a62b049",
+      "semantic_sha256": "58416f89e26425496d984aa0ce2c5125c18002d8e4faf50b2270ceaef716840d"
+    },
+    {
+      "name": "Script Editor",
+      "path": "/System/Applications/Utilities/Script Editor.app",
+      "bundle_id": "com.apple.ScriptEditor2",
+      "bundle_version": "2.11",
+      "sha256": "20da626e26e38d37444681291a3c53c24e24469c1b812c2c61dcf6816e21a1bc",
+      "semantic_sha256": "13e6a17136ac4ad13849c7912c958ac46b208dc3634f412c3f482fca5a00fe24"
+    },
+    {
+      "name": "SpeechRecognitionServer",
+      "path": "/System/Library/PrivateFrameworks/SpeechObjects.framework/Versions/A/SpeechRecognitionServer.app",
+      "bundle_id": "com.apple.speech.SpeechRecognitionServer",
+      "bundle_version": "10",
+      "sha256": "58ceee9f86ed68031241d673d7781e067fa89f40b90fbeadea529d4931c8230d",
+      "semantic_sha256": "da9ff1ae7f3c9060a3f55cb324d66cd2cff4b99928b6bf74655ed7e589ddcf32"
+    },
+    {
+      "name": "StandardAdditions",
+      "path": "/System/Library/ScriptingAdditions/StandardAdditions.osax",
+      "bundle_id": "com.apple.osax.standardadditions",
+      "bundle_version": "2.8",
+      "sha256": "15a0834b69a876e45d02e458eacefda6311215fa648297fa6fb7b30345ae8e58",
+      "semantic_sha256": "d8813fd60fd05fa1425c14516a00228bdfe684e478253d8ee96ecffbdd9a1546"
+    },
+    {
+      "name": "System Events",
+      "path": "/System/Library/CoreServices/System Events.app",
+      "bundle_id": "com.apple.systemevents",
+      "bundle_version": "1.3.6",
+      "sha256": "4d2a64771a1294f83c30c1a24476624e9148a84aa62365b5086f79e5a984ce7b",
+      "semantic_sha256": "1f216192988fc07ac7692790a164c49240174f485ce4e71ea3cf4601c51503e5"
+    },
+    {
+      "name": "System Settings",
+      "path": "/System/Applications/System Settings.app",
+      "bundle_id": "com.apple.systempreferences",
+      "bundle_version": "15.0",
+      "sha256": "45f233f52015317d71b4a2a14cbd553317d73f3e90a5e14c76628b2f3b5cceec",
+      "semantic_sha256": "692555853cc72a2f175f7eb7546f3120445d18d2a147c7e8a7f0f32aa0c0f9c6"
+    },
+    {
+      "name": "Terminal",
+      "path": "/System/Applications/Utilities/Terminal.app",
+      "bundle_id": "com.apple.Terminal",
+      "bundle_version": "2.15",
+      "sha256": "efc515ecd1bee050284942655a76654c84ff4c77f6cbe4704d7aafbabe8a92af",
+      "semantic_sha256": "41f52bc72dab0e29ffb21a3f456b9c478853a0b2a2300f869a622c2acb107f66"
+    },
+    {
+      "name": "TextEdit",
+      "path": "/System/Applications/TextEdit.app",
+      "bundle_id": "com.apple.TextEdit",
+      "bundle_version": "1.20",
+      "sha256": "6ffc0b219af8d21d74daece8bdd5df0af56e4422a913adb28b0498c76cfe7a45",
+      "semantic_sha256": "c32c3944a5856058e8ba06ead9808f8384588c7026ca9793e9a2b4a24d8458f6"
+    },
+    {
+      "name": "VoiceOver",
+      "path": "/System/Library/CoreServices/VoiceOver.app",
+      "bundle_id": "com.apple.VoiceOver",
+      "bundle_version": "10",
+      "sha256": "393ade36b8b9e18ee954484f4a89e6ca715a75273323756fb8f6a91d21549e53",
+      "semantic_sha256": "028c8c6920c2201c6bcd3a1de402b6987c2e64ae303764c5bd1e34f5733d1bfa"
+    }
+  ]
+}

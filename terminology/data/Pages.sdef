@@ -2,8 +2,11 @@
 <!DOCTYPE dictionary SYSTEM "file://localhost/System/Library/DTDs/sdef.dtd"
 [
     <!ELEMENT class (cocoa?, access-group*, type?, (contents | documentation | element | property | responds-to | synonym | xref)*)>
+    <!ENTITY % common.attrib
+        "xmlns:xi   CDATA   #FIXED 'http://www.w3.org/2001/XInclude'
+         xml:base   CDATA   #IMPLIED">
 ]>
-<dictionary xmlns:xi="http://www.w3.org/2003/XInclude" title="Pages Terminology">
+<dictionary xmlns:xi="http://www.w3.org/2001/XInclude" title="Pages Terminology">
     <xi:include href="file:///System/Library/ScriptingDefinitions/CocoaStandard.sdef" xpointer="xpointer(/dictionary/suite)" />
     <suite name="iWork Text Suite" code="iWtx" description="Classes and commands for iWorks text objects.">
         <value-type name="color" code="colr">
@@ -19,7 +22,7 @@
             <property name="font" code="font" type="text" description="The name of the font.  Can be the PostScript name, such as: &#8220;TimesNewRomanPS-ItalicMT&#8221;, or display name: &#8220;Times New Roman Italic&#8221;. TIP: Use the Font Book application get the information about a typeface.">
                 <cocoa key="fontName" />
             </property>
-            <property name="size" code="ptsz" type="integer" description="The size of the font.">
+            <property name="size" code="ptsz" type="real" description="The size of the font.">
                 <cocoa key="fontSize" />
             </property>
             <element type="character" />
@@ -87,6 +90,53 @@
         </command>
         <command name="unmerge" code="NmTbSpUm" description="Unmerge all merged cells in a specified range.">
             <direct-parameter type="range" />
+        </command>
+        <class-extension extends="document">
+            <property name="selection" code="sele" description="A list of the currently selected items." access="rw">
+                <cocoa key="scriptSelection" />
+                <type type="iWork item" list="yes" />
+            </property>
+            <property name="password protected" code="pwpt" type="boolean" description="Whether the document is password protected or not." access="r" />
+            <responds-to command="set password">
+                <cocoa method="handleSetPasswordScriptCommand:" />
+            </responds-to>
+            <responds-to command="remove password">
+                <cocoa method="handleRemovePasswordScriptCommand:" />
+            </responds-to>
+        </class-extension>
+        <command name="set password" code="NmTbPset" description="Set a password to an unencrypted document.">
+            <cocoa class="TMAScriptDocumentPasswordCommand" />
+            <direct-parameter type="text" />
+            <parameter name="to" code="Pdoc" type="document" optional="yes" description="The document to set a password to. If unspecified, the current target is assumed." />
+            <parameter name="hint" code="Phin" type="text" optional="yes" description="A hint for the password." />
+            <parameter name="saving in keychain" code="Pkch" type="boolean" optional="yes" description="Whether to save the password in keychain or not. By default, the password is not saved in the keychain." />
+            <documentation>
+                <html>
+                    <![CDATA[
+                    <div style="margin-top:8px;background-color:#eee;padding:8px;">
+                        <p>EXAMPLE SCRIPT:</p>
+                        <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><span style="color:blue;"><b>set password</b></span> &quot;p4ssw0rd&quot; <span style="color:blue;">to</span> <b>first</b> <span style="color:blue;"><i>document</i></span> <span style="color:blue;">hint</span> &quot;See the sticky note&quot; <span style="color:blue;">saving in keychain true</span></p>
+                        <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><b>tell</b> <span style="color:blue;"><i>document</i></span> &quot;Jc's Story Book&quot; <b>to <span style="color:blue;">set password</span></b> &quot;p4ssw0rd&quot;</p>
+                    </div>
+                ]]>
+</html>
+            </documentation>
+        </command>
+        <command name="remove password" code="NmTbPdel" description="Remove the password from the document.">
+            <cocoa class="TMAScriptDocumentPasswordCommand" />
+            <direct-parameter type="text" description="The current password of the document." />
+            <parameter name="from" code="Pdoc" type="document" optional="yes" description="The document from which to remove the password. If unspecified, the current target is assumed." />
+            <documentation>
+                <html>
+                    <![CDATA[
+                    <div style="margin-top:8px;background-color:#eee;padding:8px;">
+                        <p>EXAMPLE SCRIPT:</p>
+                        <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><span style="color:blue;"><b>remove password</b></span> &quot;p4ssw0rd&quot; <span style="color:blue;">from</span> <b>last</b> <span style="color:blue;"><i>document</i></span></p>
+                        <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><b>tell</b> <span style="color:blue;"><i>document</i></span> &quot;Letter to Sun Young&quot; <b>to <span style="color:blue;">remove password</span></b> &quot;p4ssw0rd&quot;</p>
+                    </div>
+                ]]>
+</html>
+            </documentation>
         </command>
         <class name="iWork container" code="iwkc" description="A container for iWork items">
             <element type="audio clip">
@@ -564,11 +614,23 @@
             <property name="image quality" code="PxPI" type="image quality" description="image quality">
                 <cocoa key="TSKExportOptionsImageQuality" />
             </property>
+            <property name="include comments" code="PxRC" type="boolean" description="include comments">
+                <cocoa key="TSKExportOptionsRenderComments" />
+            </property>
+            <property name="include annotations" code="PxRA" type="boolean" description="include smart annotations">
+                <cocoa key="TSKExportOptionsRenderAnnotations" />
+            </property>
         </record-type>
         <class-extension extends="application" description="The Pages application.">
             <element type="template" access="r">
                 <cocoa key="orderedTemplates" />
             </element>
+        </class-extension>
+        <class-extension extends="window" description="A Pages document window.">
+            <cocoa class="TPMacDocumentWindow" />
+            <property name="two up" code="p2Up" type="boolean" description="Whether the window is displaying pages as two up.">
+                <cocoa key="scriptTwoUp" />
+            </property>
         </class-extension>
         <class-extension extends="document" description="A Pages document.">
             <cocoa class="TPMacDocument" />
@@ -583,6 +645,9 @@
             </property>
             <property name="document body" code="pDbo" type="boolean" description="Whether the document has body text." access="r">
                 <cocoa key="scriptHasBodyText" />
+            </property>
+            <property name="facing pages" code="pFPa" type="boolean" description="Whether the document has facing pages.">
+                <cocoa key="scriptHasFacingPages" />
             </property>
             <property name="current page" code="pCpa" type="page" description="Current page of the document." access="r">
                 <cocoa key="scriptCurrentPage" />
@@ -631,7 +696,7 @@
             </responds-to>
         </class-extension>
         <class name="template" code="tmpl" description="A styled document layout.">
-            <cocoa class="TSATemplateInfo" />
+            <cocoa class="TSATemplateDescription" />
             <property name="id" code="ID  " type="text" description="The identifier used by the application." access="r">
                 <cocoa key="identifier" />
             </property>
@@ -648,6 +713,7 @@
                     <div style="margin-top:8px;background-color:#eee;padding:8px;">
                         <p>EXAMPLE SCRIPT: Create a new Pages document using a template</p>
                         <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><span style="color:blue;"><b>make</b> new <i>document</i> with properties</span> {<span style="color:blue;">document template</span>:<span style="color:blue;">template</span> &quot;Essay&quot;}</p>
+                        <p style="font-family:Verdana, sans-serif;text-indent:1.5em;"><span style="color:blue;"><b>make</b> new <i>document</i> with data <i>POSIX file</i></span> &quot;&#47;path&#47;to&#47;user-template.template&quot;</p>
                     </div>
                 ]]>
 </html>
@@ -735,7 +801,7 @@
                              <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">EPUB</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">EPUB</td></tr>
                              <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">Unformatted Text</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">txt, text</td></tr>
                              <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">PDF</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">pdf</td></tr>
-                             <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">Microsoft Word</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">docx, doc</td></tr>
+                             <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">Microsoft Word</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">docx</td></tr>
                              <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">Pages 09</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">pages</td></tr>
                              <tr><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">Formatted Text</td><td style="border-style:solid;border-color:#ccc;border-width:2px;padding:4px;">rtf, rtfd</td></tr>
                          </table>
