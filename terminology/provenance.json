@@ -1,10 +1,16 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "host": {
     "product_version": "26.6",
     "build_version": "25G72",
     "architecture": "arm64",
     "sdef_path": "/usr/bin/sdef"
+  },
+  "language": {
+    "source": "OSAGetSysTerminology",
+    "terminology_id": 0,
+    "sha256": "757202df0f89f501fdf649eea80fd38b5a116e4d6fe905913b1bc8bf313fbecb",
+    "generated_sha256": "3f99ba7419134cff03fbb72579890f156841beb5bf20533fa762ac35abe41dda"
   },
   "entries": [
     {

@@ -115,11 +115,21 @@ func TestCommittedProvenanceMatchesSnapshots(t *testing.T) {
 	if err := json.Unmarshal(raw, &recorded); err != nil {
 		t.Fatal(err)
 	}
-	if recorded.SchemaVersion != 2 {
-		t.Fatalf("provenance schema version = %d, want 2", recorded.SchemaVersion)
+	if recorded.SchemaVersion != 3 {
+		t.Fatalf("provenance schema version = %d, want 3", recorded.SchemaVersion)
 	}
 	if recorded.Host.ProductVersion == "" || recorded.Host.BuildVersion == "" || recorded.Host.Architecture == "" || recorded.Host.SdefPath == "" {
 		t.Fatalf("incomplete provenance host: %#v", recorded.Host)
+	}
+	if recorded.Language.Source != "OSAGetSysTerminology" || recorded.Language.SHA256 == "" {
+		t.Fatalf("incomplete language provenance: %#v", recorded.Language)
+	}
+	language, err := os.ReadFile(filepath.Join(terminologyDir, "language.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := digest(language); got != recorded.Language.GeneratedSHA256 {
+		t.Fatalf("language hash = %s, provenance records %s", got, recorded.Language.GeneratedSHA256)
 	}
 	paths, err := filepath.Glob(filepath.Join(terminologyDir, "data", "*.sdef"))
 	if err != nil {

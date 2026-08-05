@@ -1022,6 +1022,9 @@ func considerationNames(value ast.Expr, terms *terminology.Registry) []string {
 	if len(codeBytes) == 4 && terms != nil {
 		var code terminology.Code4
 		copy(code[:], codeBytes)
+		if name, ok := terms.LanguageEnumeration(code); ok {
+			return []string{name}
+		}
 		if name, ok := terms.Term(code); ok {
 			return []string{name}
 		}

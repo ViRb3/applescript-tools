@@ -1,0 +1,2506 @@
+{
+  "schema_version": 1,
+  "source": "OSAGetSysTerminology",
+  "commands": [
+    {
+      "code": "ToySlog0",
+      "name": "stop log"
+    },
+    {
+      "code": "ToySlog1",
+      "name": "start log"
+    },
+    {
+      "code": "aevtoapp",
+      "name": "run"
+    },
+    {
+      "code": "aevtodoc",
+      "name": "open",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "aevtpdoc",
+      "name": "print",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "aevtquit",
+      "name": "quit",
+      "parameters": [
+        {
+          "code": "savo",
+          "name": "saving",
+          "type": "savo"
+        }
+      ]
+    },
+    {
+      "code": "aevtrapp",
+      "name": "reopen"
+    },
+    {
+      "code": "ascr*   ",
+      "name": "*",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascr+   ",
+      "name": "+",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascr-   ",
+      "name": "-",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascr/   ",
+      "name": "÷",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascr\u003c   ",
+      "name": "\u003c",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascr\u003c=  ",
+      "name": "≤",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascr=   ",
+      "name": "=",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascr\u003e   ",
+      "name": "\u003e",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascr\u003e=  ",
+      "name": "≥",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrAND ",
+      "name": "and",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrNOT ",
+      "name": "not",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrOR  ",
+      "name": "or",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascr^   ",
+      "name": "^",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrbgwt",
+      "name": "starts with",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrccat",
+      "name": "\u0026",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrcmnt",
+      "name": "log",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrcoer",
+      "name": "as",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrcont",
+      "name": "contains",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrdiv ",
+      "name": "div",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrends",
+      "name": "ends with",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrerr ",
+      "name": "error",
+      "has_direct_parameter": true,
+      "parameters": [
+        {
+          "code": "errn",
+          "name": "number",
+          "type": "shor"
+        },
+        {
+          "code": "ptlr",
+          "name": "partial result",
+          "type": "list"
+        },
+        {
+          "code": "erob",
+          "name": "from",
+          "type": "****"
+        },
+        {
+          "code": "errt",
+          "name": "to",
+          "type": "****"
+        }
+      ]
+    },
+    {
+      "code": "ascrmod ",
+      "name": "mod",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrneg ",
+      "name": "negate",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "ascrnoop",
+      "name": "launch"
+    },
+    {
+      "code": "ascrpsbr",
+      "name": "Call•subroutine",
+      "has_direct_parameter": true,
+      "parameters": [
+        {
+          "code": "at  ",
+          "name": "at",
+          "type": "****"
+        },
+        {
+          "code": "from",
+          "name": "from",
+          "type": "****"
+        },
+        {
+          "code": "for ",
+          "name": "for",
+          "type": "****"
+        },
+        {
+          "code": "to  ",
+          "name": "to",
+          "type": "****"
+        },
+        {
+          "code": "thru",
+          "name": "thru",
+          "type": "****"
+        },
+        {
+          "code": "thgh",
+          "name": "through",
+          "type": "****"
+        },
+        {
+          "code": "by  ",
+          "name": "by",
+          "type": "****"
+        },
+        {
+          "code": "on  ",
+          "name": "on",
+          "type": "****"
+        },
+        {
+          "code": "into",
+          "name": "into",
+          "type": "****"
+        },
+        {
+          "code": "onto",
+          "name": "onto",
+          "type": "****"
+        },
+        {
+          "code": "btwn",
+          "name": "between",
+          "type": "****"
+        },
+        {
+          "code": "agst",
+          "name": "against",
+          "type": "****"
+        },
+        {
+          "code": "outo",
+          "name": "out of",
+          "type": "****"
+        },
+        {
+          "code": "isto",
+          "name": "instead of",
+          "type": "****"
+        },
+        {
+          "code": "asdf",
+          "name": "aside from",
+          "type": "****"
+        },
+        {
+          "code": "arnd",
+          "name": "around",
+          "type": "****"
+        },
+        {
+          "code": "bsid",
+          "name": "beside",
+          "type": "****"
+        },
+        {
+          "code": "bnth",
+          "name": "beneath",
+          "type": "****"
+        },
+        {
+          "code": "undr",
+          "name": "under",
+          "type": "****"
+        },
+        {
+          "code": "over",
+          "name": "over",
+          "type": "****"
+        },
+        {
+          "code": "abve",
+          "name": "above",
+          "type": "****"
+        },
+        {
+          "code": "belw",
+          "name": "below",
+          "type": "****"
+        },
+        {
+          "code": "aprt",
+          "name": "apart from",
+          "type": "****"
+        },
+        {
+          "code": "abou",
+          "name": "about",
+          "type": "****"
+        },
+        {
+          "code": "snce",
+          "name": "since",
+          "type": "****"
+        },
+        {
+          "code": "givn",
+          "name": "given",
+          "type": "****"
+        },
+        {
+          "code": "with",
+          "name": "with",
+          "type": "type"
+        },
+        {
+          "code": "wout",
+          "name": "without",
+          "type": "type"
+        }
+      ]
+    },
+    {
+      "code": "ascrtell",
+      "name": "tell"
+    },
+    {
+      "code": "ascrtend",
+      "name": "end tell"
+    },
+    {
+      "code": "ascruse ",
+      "name": "use",
+      "has_direct_parameter": true,
+      "parameters": [
+        {
+          "code": "minv",
+          "name": "version",
+          "type": "ns  "
+        },
+        {
+          "code": "impr",
+          "name": "importing",
+          "type": "list"
+        },
+        {
+          "code": "impx",
+          "name": "excluding",
+          "type": "list"
+        }
+      ]
+    },
+    {
+      "code": "ascr≠   ",
+      "name": "≠",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "coreclon",
+      "name": "duplicate",
+      "has_direct_parameter": true,
+      "parameters": [
+        {
+          "code": "insh",
+          "name": "to",
+          "type": "insl"
+        },
+        {
+          "code": "prdt",
+          "name": "with properties",
+          "type": "reco"
+        }
+      ]
+    },
+    {
+      "code": "coreclos",
+      "name": "close",
+      "has_direct_parameter": true,
+      "parameters": [
+        {
+          "code": "savo",
+          "name": "saving",
+          "type": "savo"
+        },
+        {
+          "code": "kfil",
+          "name": "saving in",
+          "type": "file"
+        }
+      ]
+    },
+    {
+      "code": "corecnte",
+      "name": "count",
+      "has_direct_parameter": true,
+      "parameters": [
+        {
+          "code": "kocl",
+          "name": "each",
+          "type": "type"
+        }
+      ]
+    },
+    {
+      "code": "corecrel",
+      "name": "make",
+      "parameters": [
+        {
+          "code": "kocl",
+          "name": "new",
+          "type": "type"
+        },
+        {
+          "code": "insh",
+          "name": "at",
+          "type": "insl"
+        },
+        {
+          "code": "data",
+          "name": "with data",
+          "type": "****"
+        },
+        {
+          "code": "prdt",
+          "name": "with properties",
+          "type": "reco"
+        }
+      ]
+    },
+    {
+      "code": "coredelo",
+      "name": "delete",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "coredoex",
+      "name": "exists",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "coredsiz",
+      "name": "data size",
+      "has_direct_parameter": true,
+      "parameters": [
+        {
+          "code": "rtyp",
+          "name": "as",
+          "type": "type"
+        }
+      ]
+    },
+    {
+      "code": "coregtei",
+      "name": "event info",
+      "has_direct_parameter": true,
+      "parameters": [
+        {
+          "code": "wrcd",
+          "name": "in",
+          "type": "intl"
+        }
+      ]
+    },
+    {
+      "code": "coregtsi",
+      "name": "suite info",
+      "has_direct_parameter": true,
+      "parameters": [
+        {
+          "code": "wrcd",
+          "name": "in",
+          "type": "intl"
+        }
+      ]
+    },
+    {
+      "code": "coremove",
+      "name": "move",
+      "has_direct_parameter": true,
+      "parameters": [
+        {
+          "code": "insh",
+          "name": "to",
+          "type": "insl"
+        }
+      ]
+    },
+    {
+      "code": "coreqobj",
+      "name": "class info",
+      "has_direct_parameter": true,
+      "parameters": [
+        {
+          "code": "wrcd",
+          "name": "in",
+          "type": "intl"
+        }
+      ]
+    },
+    {
+      "code": "coresave",
+      "name": "save",
+      "has_direct_parameter": true,
+      "parameters": [
+        {
+          "code": "kfil",
+          "name": "in",
+          "type": "file"
+        },
+        {
+          "code": "fltp",
+          "name": "as",
+          "type": "type"
+        }
+      ]
+    },
+    {
+      "code": "miscactv",
+      "name": "activate"
+    },
+    {
+      "code": "miscidle",
+      "name": "idle"
+    },
+    {
+      "code": "miscslct",
+      "name": "select",
+      "has_direct_parameter": true
+    },
+    {
+      "code": "sysodela",
+      "name": "delay",
+      "has_direct_parameter": true
+    }
+  ],
+  "terms": [
+    {
+      "code": "****",
+      "name": "anything"
+    },
+    {
+      "code": "EPS ",
+      "name": "PostScript picture"
+    },
+    {
+      "code": "GIFf",
+      "name": "GIF picture"
+    },
+    {
+      "code": "ID  ",
+      "name": "id"
+    },
+    {
+      "code": "JPEG",
+      "name": "JPEG picture"
+    },
+    {
+      "code": "PICT",
+      "name": "picture"
+    },
+    {
+      "code": "QDpt",
+      "name": "point"
+    },
+    {
+      "code": "STXT",
+      "name": "styled text"
+    },
+    {
+      "code": "TEXT",
+      "name": "string"
+    },
+    {
+      "code": "TIFF",
+      "name": "TIFF picture"
+    },
+    {
+      "code": "aete",
+      "name": "application dictionary"
+    },
+    {
+      "code": "aeut",
+      "name": "system dictionary"
+    },
+    {
+      "code": "alis",
+      "name": "alias"
+    },
+    {
+      "code": "apr ",
+      "name": "April"
+    },
+    {
+      "code": "arro",
+      "name": "arrow style"
+    },
+    {
+      "code": "ascr",
+      "name": "AppleScript"
+    },
+    {
+      "code": "aug ",
+      "name": "August"
+    },
+    {
+      "code": "bool",
+      "name": "boolean"
+    },
+    {
+      "code": "c@#!",
+      "name": ""
+    },
+    {
+      "code": "c@#^",
+      "name": "\u003cInheritance\u003e"
+    },
+    {
+      "code": "cRGB",
+      "name": "RGB color"
+    },
+    {
+      "code": "cadb",
+      "name": "ADB address"
+    },
+    {
+      "code": "cadr",
+      "name": "address specification"
+    },
+    {
+      "code": "capp",
+      "name": "app"
+    },
+    {
+      "code": "carc",
+      "name": "arc"
+    },
+    {
+      "code": "case",
+      "name": "upper case"
+    },
+    {
+      "code": "cat ",
+      "name": "AppleTalk address"
+    },
+    {
+      "code": "cbus",
+      "name": "bus slot"
+    },
+    {
+      "code": "ccel",
+      "name": "cell"
+    },
+    {
+      "code": "ccmt",
+      "name": "cubic centimetres"
+    },
+    {
+      "code": "ccol",
+      "name": "column"
+    },
+    {
+      "code": "cdev",
+      "name": "device specification"
+    },
+    {
+      "code": "cdrw",
+      "name": "drawing area"
+    },
+    {
+      "code": "cen ",
+      "name": "Ethernet address"
+    },
+    {
+      "code": "cfet",
+      "name": "cubic feet"
+    },
+    {
+      "code": "cflo",
+      "name": "text flow"
+    },
+    {
+      "code": "cfw ",
+      "name": "FireWire address"
+    },
+    {
+      "code": "cgob",
+      "name": "graphic object"
+    },
+    {
+      "code": "cgsh",
+      "name": "graphic shape"
+    },
+    {
+      "code": "cgtx",
+      "name": "graphic text"
+    },
+    {
+      "code": "cha ",
+      "name": "character"
+    },
+    {
+      "code": "cins",
+      "name": "insertion point"
+    },
+    {
+      "code": "cip ",
+      "name": "IP address"
+    },
+    {
+      "code": "citl",
+      "name": "writing code info"
+    },
+    {
+      "code": "citm",
+      "name": "text item"
+    },
+    {
+      "code": "clin",
+      "name": "line"
+    },
+    {
+      "code": "clrt",
+      "name": "color table"
+    },
+    {
+      "code": "clt ",
+      "name": "LocalTalk address"
+    },
+    {
+      "code": "cltb",
+      "name": "color table"
+    },
+    {
+      "code": "cmen",
+      "name": "menu item"
+    },
+    {
+      "code": "cmet",
+      "name": "cubic metres"
+    },
+    {
+      "code": "cmnu",
+      "name": "menu"
+    },
+    {
+      "code": "cmtr",
+      "name": "centimetres"
+    },
+    {
+      "code": "cobj",
+      "name": "item"
+    },
+    {
+      "code": "colr",
+      "name": "color"
+    },
+    {
+      "code": "comp",
+      "name": "double integer"
+    },
+    {
+      "code": "covl",
+      "name": "oval"
+    },
+    {
+      "code": "cpar",
+      "name": "paragraph"
+    },
+    {
+      "code": "cpgn",
+      "name": "polygon"
+    },
+    {
+      "code": "cpic",
+      "name": "graphic group"
+    },
+    {
+      "code": "cpix",
+      "name": "pixel map"
+    },
+    {
+      "code": "cpxl",
+      "name": "pixel"
+    },
+    {
+      "code": "crec",
+      "name": "rectangle"
+    },
+    {
+      "code": "crow",
+      "name": "row"
+    },
+    {
+      "code": "crrc",
+      "name": "rounded rectangle"
+    },
+    {
+      "code": "cscs",
+      "name": "SCSI address"
+    },
+    {
+      "code": "csel",
+      "name": "selection-object"
+    },
+    {
+      "code": "cstr",
+      "name": "C string"
+    },
+    {
+      "code": "ctbl",
+      "name": "table"
+    },
+    {
+      "code": "ctok",
+      "name": "Token Ring address"
+    },
+    {
+      "code": "ctxt",
+      "name": "text"
+    },
+    {
+      "code": "cuin",
+      "name": "cubic inches"
+    },
+    {
+      "code": "cusb",
+      "name": "USB address"
+    },
+    {
+      "code": "cwin",
+      "name": "window"
+    },
+    {
+      "code": "cwor",
+      "name": "word"
+    },
+    {
+      "code": "cyrd",
+      "name": "cubic yards"
+    },
+    {
+      "code": "day ",
+      "name": "day"
+    },
+    {
+      "code": "days",
+      "name": "days"
+    },
+    {
+      "code": "dec ",
+      "name": "December"
+    },
+    {
+      "code": "degc",
+      "name": "degrees Celsius"
+    },
+    {
+      "code": "degf",
+      "name": "degrees Fahrenheit"
+    },
+    {
+      "code": "degk",
+      "name": "degrees Kelvin"
+    },
+    {
+      "code": "docu",
+      "name": "document"
+    },
+    {
+      "code": "doub",
+      "name": "real"
+    },
+    {
+      "code": "dstr",
+      "name": "date string"
+    },
+    {
+      "code": "dylb",
+      "name": "dynamic library"
+    },
+    {
+      "code": "elin",
+      "name": "type element info"
+    },
+    {
+      "code": "encs",
+      "name": "encoded string"
+    },
+    {
+      "code": "enum",
+      "name": "constant"
+    },
+    {
+      "code": "evin",
+      "name": "type event info"
+    },
+    {
+      "code": "evnt",
+      "name": "event"
+    },
+    {
+      "code": "exte",
+      "name": "extended real"
+    },
+    {
+      "code": "feb ",
+      "name": "February"
+    },
+    {
+      "code": "feet",
+      "name": "feet"
+    },
+    {
+      "code": "file",
+      "name": "file"
+    },
+    {
+      "code": "fixd",
+      "name": "fixed"
+    },
+    {
+      "code": "flcl",
+      "name": "fill color"
+    },
+    {
+      "code": "flpt",
+      "name": "fill pattern"
+    },
+    {
+      "code": "font",
+      "name": "font"
+    },
+    {
+      "code": "fpnt",
+      "name": "fixed point"
+    },
+    {
+      "code": "frct",
+      "name": "fixed rectangle"
+    },
+    {
+      "code": "fri ",
+      "name": "Friday"
+    },
+    {
+      "code": "frmk",
+      "name": "framework"
+    },
+    {
+      "code": "fss ",
+      "name": "file specification"
+    },
+    {
+      "code": "galn",
+      "name": "gallons"
+    },
+    {
+      "code": "gcli",
+      "name": "type class info"
+    },
+    {
+      "code": "glin",
+      "name": "graphic line"
+    },
+    {
+      "code": "gobs",
+      "name": "ordering"
+    },
+    {
+      "code": "gram",
+      "name": "grams"
+    },
+    {
+      "code": "hand",
+      "name": "handler"
+    },
+    {
+      "code": "hclb",
+      "name": "closeable"
+    },
+    {
+      "code": "hour",
+      "name": "hours"
+    },
+    {
+      "code": "imod",
+      "name": "modified"
+    },
+    {
+      "code": "inch",
+      "name": "inches"
+    },
+    {
+      "code": "insl",
+      "name": "location reference"
+    },
+    {
+      "code": "isfl",
+      "name": "floating"
+    },
+    {
+      "code": "iszm",
+      "name": "zoomable"
+    },
+    {
+      "code": "itxt",
+      "name": "international text"
+    },
+    {
+      "code": "jan ",
+      "name": "January"
+    },
+    {
+      "code": "jul ",
+      "name": "July"
+    },
+    {
+      "code": "jun ",
+      "name": "June"
+    },
+    {
+      "code": "kMod",
+      "name": "modifiers"
+    },
+    {
+      "code": "kMsg",
+      "name": "key"
+    },
+    {
+      "code": "kfrm",
+      "name": "reference form"
+    },
+    {
+      "code": "kgrm",
+      "name": "kilograms"
+    },
+    {
+      "code": "kknd",
+      "name": "key kind"
+    },
+    {
+      "code": "kmtr",
+      "name": "kilometres"
+    },
+    {
+      "code": "kprs",
+      "name": "keystroke"
+    },
+    {
+      "code": "lbs ",
+      "name": "pounds"
+    },
+    {
+      "code": "ldt ",
+      "name": "date"
+    },
+    {
+      "code": "leng",
+      "name": "length"
+    },
+    {
+      "code": "lfpt",
+      "name": "long fixed point"
+    },
+    {
+      "code": "lfrc",
+      "name": "long fixed rectangle"
+    },
+    {
+      "code": "lfxd",
+      "name": "long fixed"
+    },
+    {
+      "code": "list",
+      "name": "list"
+    },
+    {
+      "code": "litr",
+      "name": "litres"
+    },
+    {
+      "code": "llst",
+      "name": "linked list"
+    },
+    {
+      "code": "lnfd",
+      "name": "linefeed"
+    },
+    {
+      "code": "long",
+      "name": "integer"
+    },
+    {
+      "code": "lpnt",
+      "name": "long point"
+    },
+    {
+      "code": "lr  ",
+      "name": "list or record"
+    },
+    {
+      "code": "lrct",
+      "name": "long rectangle"
+    },
+    {
+      "code": "lrs ",
+      "name": "list, record or text"
+    },
+    {
+      "code": "ls  ",
+      "name": "list or string"
+    },
+    {
+      "code": "mLoc",
+      "name": "machine location"
+    },
+    {
+      "code": "mach",
+      "name": "machine"
+    },
+    {
+      "code": "magn",
+      "name": "unsigned integer"
+    },
+    {
+      "code": "mar ",
+      "name": "March"
+    },
+    {
+      "code": "may ",
+      "name": "May"
+    },
+    {
+      "code": "metr",
+      "name": "metres"
+    },
+    {
+      "code": "mile",
+      "name": "miles"
+    },
+    {
+      "code": "min ",
+      "name": "minutes"
+    },
+    {
+      "code": "mnth",
+      "name": "month"
+    },
+    {
+      "code": "mon ",
+      "name": "Monday"
+    },
+    {
+      "code": "msng",
+      "name": "missing value"
+    },
+    {
+      "code": "nd  ",
+      "name": "number or date"
+    },
+    {
+      "code": "nds ",
+      "name": "number, date or text"
+    },
+    {
+      "code": "nmbr",
+      "name": "number"
+    },
+    {
+      "code": "nov ",
+      "name": "November"
+    },
+    {
+      "code": "ns  ",
+      "name": "number or string"
+    },
+    {
+      "code": "null",
+      "name": "null"
+    },
+    {
+      "code": "obj ",
+      "name": "reference"
+    },
+    {
+      "code": "oct ",
+      "name": "October"
+    },
+    {
+      "code": "ofst",
+      "name": "off styles"
+    },
+    {
+      "code": "onst",
+      "name": "on styles"
+    },
+    {
+      "code": "osax",
+      "name": "scripting addition"
+    },
+    {
+      "code": "ozs ",
+      "name": "ounces"
+    },
+    {
+      "code": "pALL",
+      "name": "properties"
+    },
+    {
+      "code": "pang",
+      "name": "start angle"
+    },
+    {
+      "code": "parc",
+      "name": "arc angle"
+    },
+    {
+      "code": "pare",
+      "name": "parent"
+    },
+    {
+      "code": "patm",
+      "name": "AppleTalk machine"
+    },
+    {
+      "code": "patt",
+      "name": "AppleTalk type"
+    },
+    {
+      "code": "patz",
+      "name": "AppleTalk zone"
+    },
+    {
+      "code": "pbcl",
+      "name": "background color"
+    },
+    {
+      "code": "pbnd",
+      "name": "bounds"
+    },
+    {
+      "code": "pbpt",
+      "name": "background pattern"
+    },
+    {
+      "code": "pchd",
+      "name": "corner curve height"
+    },
+    {
+      "code": "pcli",
+      "name": "clipboard"
+    },
+    {
+      "code": "pcls",
+      "name": "class"
+    },
+    {
+      "code": "pcnt",
+      "name": "contents"
+    },
+    {
+      "code": "pcon",
+      "name": "conduit"
+    },
+    {
+      "code": "pcwd",
+      "name": "corner curve width"
+    },
+    {
+      "code": "pdns",
+      "name": "DNS form"
+    },
+    {
+      "code": "pdpt",
+      "name": "pixel depth"
+    },
+    {
+      "code": "pdrt",
+      "name": "definition rect"
+    },
+    {
+      "code": "pdst",
+      "name": "dash style"
+    },
+    {
+      "code": "pdva",
+      "name": "device address"
+    },
+    {
+      "code": "pdvt",
+      "name": "device type"
+    },
+    {
+      "code": "pend",
+      "name": "end point"
+    },
+    {
+      "code": "pfor",
+      "name": "formula"
+    },
+    {
+      "code": "pi  ",
+      "name": "pi"
+    },
+    {
+      "code": "pidx",
+      "name": "index"
+    },
+    {
+      "code": "pimr",
+      "name": "required import items"
+    },
+    {
+      "code": "pinf",
+      "name": "type property info"
+    },
+    {
+      "code": "pisf",
+      "name": "frontmost"
+    },
+    {
+      "code": "pjst",
+      "name": "justification"
+    },
+    {
+      "code": "plcd",
+      "name": "language code"
+    },
+    {
+      "code": "pmin",
+      "name": "type parameter info"
+    },
+    {
+      "code": "pmod",
+      "name": "modal"
+    },
+    {
+      "code": "pnam",
+      "name": "name"
+    },
+    {
+      "code": "pnel",
+      "name": "default location"
+    },
+    {
+      "code": "pnet",
+      "name": "network"
+    },
+    {
+      "code": "pnod",
+      "name": "node"
+    },
+    {
+      "code": "ppcl",
+      "name": "pen color"
+    },
+    {
+      "code": "ppga",
+      "name": "progress additional description"
+    },
+    {
+      "code": "ppgc",
+      "name": "progress completed steps"
+    },
+    {
+      "code": "ppgd",
+      "name": "progress description"
+    },
+    {
+      "code": "ppgt",
+      "name": "progress total steps"
+    },
+    {
+      "code": "ppor",
+      "name": "port"
+    },
+    {
+      "code": "pppa",
+      "name": "pen pattern"
+    },
+    {
+      "code": "ppro",
+      "name": "protection"
+    },
+    {
+      "code": "pprt",
+      "name": "protocol"
+    },
+    {
+      "code": "pptm",
+      "name": "transfer mode"
+    },
+    {
+      "code": "ppwd",
+      "name": "pen width"
+    },
+    {
+      "code": "prdp",
+      "name": "print depth"
+    },
+    {
+      "code": "prep",
+      "name": "preposition"
+    },
+    {
+      "code": "prln",
+      "name": "print length"
+    },
+    {
+      "code": "prop",
+      "name": "property"
+    },
+    {
+      "code": "prot",
+      "name": "rotation"
+    },
+    {
+      "code": "prsz",
+      "name": "resizable"
+    },
+    {
+      "code": "prun",
+      "name": "running"
+    },
+    {
+      "code": "pscb",
+      "name": "SCSI bus"
+    },
+    {
+      "code": "pscd",
+      "name": "script code"
+    },
+    {
+      "code": "pscl",
+      "name": "scale"
+    },
+    {
+      "code": "psct",
+      "name": "writing code"
+    },
+    {
+      "code": "pslu",
+      "name": "LUN"
+    },
+    {
+      "code": "psoc",
+      "name": "socket"
+    },
+    {
+      "code": "pstp",
+      "name": "start point"
+    },
+    {
+      "code": "pstr",
+      "name": "Pascal string"
+    },
+    {
+      "code": "psxf",
+      "name": "POSIX file"
+    },
+    {
+      "code": "psxp",
+      "name": "POSIX path"
+    },
+    {
+      "code": "ptit",
+      "name": "titled"
+    },
+    {
+      "code": "ptlt",
+      "name": "point list"
+    },
+    {
+      "code": "ptps",
+      "name": "default size"
+    },
+    {
+      "code": "ptrs",
+      "name": "translation"
+    },
+    {
+      "code": "ptsz",
+      "name": "size"
+    },
+    {
+      "code": "ptxc",
+      "name": "text color"
+    },
+    {
+      "code": "ptxf",
+      "name": "default font"
+    },
+    {
+      "code": "pupd",
+      "name": "update on change"
+    },
+    {
+      "code": "pvis",
+      "name": "visible"
+    },
+    {
+      "code": "pzum",
+      "name": "zoomed"
+    },
+    {
+      "code": "qdrt",
+      "name": "bounding rectangle"
+    },
+    {
+      "code": "qrts",
+      "name": "quarts"
+    },
+    {
+      "code": "quot",
+      "name": "quote"
+    },
+    {
+      "code": "rdat",
+      "name": "data"
+    },
+    {
+      "code": "reco",
+      "name": "record"
+    },
+    {
+      "code": "rest",
+      "name": "rest"
+    },
+    {
+      "code": "ret ",
+      "name": "return"
+    },
+    {
+      "code": "rslt",
+      "name": "result"
+    },
+    {
+      "code": "rvse",
+      "name": "reverse"
+    },
+    {
+      "code": "sat ",
+      "name": "Saturday"
+    },
+    {
+      "code": "scnd",
+      "name": "seconds"
+    },
+    {
+      "code": "scpt",
+      "name": "script"
+    },
+    {
+      "code": "sele",
+      "name": "selection"
+    },
+    {
+      "code": "sep ",
+      "name": "September"
+    },
+    {
+      "code": "sf  ",
+      "name": "alias or string"
+    },
+    {
+      "code": "shdt",
+      "name": "short date string"
+    },
+    {
+      "code": "shor",
+      "name": "small integer"
+    },
+    {
+      "code": "sing",
+      "name": "small real"
+    },
+    {
+      "code": "snd ",
+      "name": "sound"
+    },
+    {
+      "code": "spac",
+      "name": "space"
+    },
+    {
+      "code": "sqft",
+      "name": "square feet"
+    },
+    {
+      "code": "sqkm",
+      "name": "square kilometres"
+    },
+    {
+      "code": "sqmi",
+      "name": "square miles"
+    },
+    {
+      "code": "sqrm",
+      "name": "square metres"
+    },
+    {
+      "code": "sqyd",
+      "name": "square yards"
+    },
+    {
+      "code": "strq",
+      "name": "quoted form"
+    },
+    {
+      "code": "styl",
+      "name": "styled Clipboard text"
+    },
+    {
+      "code": "suin",
+      "name": "type suite info"
+    },
+    {
+      "code": "sun ",
+      "name": "Sunday"
+    },
+    {
+      "code": "sutx",
+      "name": "styled Unicode text"
+    },
+    {
+      "code": "tab ",
+      "name": "tab"
+    },
+    {
+      "code": "tdas",
+      "name": "dash style"
+    },
+    {
+      "code": "thu ",
+      "name": "Thursday"
+    },
+    {
+      "code": "time",
+      "name": "time"
+    },
+    {
+      "code": "tpmm",
+      "name": "pixel map record"
+    },
+    {
+      "code": "tr16",
+      "name": "RGB16 color"
+    },
+    {
+      "code": "tr96",
+      "name": "RGB96 color"
+    },
+    {
+      "code": "trot",
+      "name": "rotation"
+    },
+    {
+      "code": "tstr",
+      "name": "time string"
+    },
+    {
+      "code": "tsty",
+      "name": "text style info"
+    },
+    {
+      "code": "tue ",
+      "name": "Tuesday"
+    },
+    {
+      "code": "txdl",
+      "name": "text item delimiters"
+    },
+    {
+      "code": "txst",
+      "name": "style"
+    },
+    {
+      "code": "type",
+      "name": "type class"
+    },
+    {
+      "code": "undf",
+      "name": ""
+    },
+    {
+      "code": "ustl",
+      "name": "uniform styles"
+    },
+    {
+      "code": "utxt",
+      "name": "Unicode text"
+    },
+    {
+      "code": "vect",
+      "name": "vector"
+    },
+    {
+      "code": "vers",
+      "name": "version"
+    },
+    {
+      "code": "wed ",
+      "name": "Wednesday"
+    },
+    {
+      "code": "week",
+      "name": "weeks"
+    },
+    {
+      "code": "wkdy",
+      "name": "weekday"
+    },
+    {
+      "code": "yard",
+      "name": "yards"
+    },
+    {
+      "code": "year",
+      "name": "year"
+    }
+  ],
+  "enumerations": [
+    {
+      "group": "arro",
+      "code": "arbo",
+      "name": "arrow at both ends"
+    },
+    {
+      "group": "arro",
+      "code": "aren",
+      "name": "arrow at end"
+    },
+    {
+      "group": "arro",
+      "code": "arno",
+      "name": "no arrow"
+    },
+    {
+      "group": "arro",
+      "code": "arst",
+      "name": "arrow at start"
+    },
+    {
+      "group": "boov",
+      "code": "fals",
+      "name": "false"
+    },
+    {
+      "group": "boov",
+      "code": "true",
+      "name": "true"
+    },
+    {
+      "group": "cons",
+      "code": "case",
+      "name": "case"
+    },
+    {
+      "group": "cons",
+      "code": "diac",
+      "name": "diacriticals"
+    },
+    {
+      "group": "cons",
+      "code": "hyph",
+      "name": "hyphens"
+    },
+    {
+      "group": "cons",
+      "code": "nume",
+      "name": "numeric strings"
+    },
+    {
+      "group": "cons",
+      "code": "punc",
+      "name": "punctuation"
+    },
+    {
+      "group": "cons",
+      "code": "rmte",
+      "name": "application responses"
+    },
+    {
+      "group": "cons",
+      "code": "whit",
+      "name": "white space"
+    },
+    {
+      "group": "eMds",
+      "code": "Kclk",
+      "name": "caps lock down"
+    },
+    {
+      "group": "eMds",
+      "code": "Kcmd",
+      "name": "command down"
+    },
+    {
+      "group": "eMds",
+      "code": "Kctl",
+      "name": "control down"
+    },
+    {
+      "group": "eMds",
+      "code": "Kopt",
+      "name": "option down"
+    },
+    {
+      "group": "eMds",
+      "code": "Ksft",
+      "name": "shift down"
+    },
+    {
+      "group": "econ",
+      "code": "eadb",
+      "name": "ADB"
+    },
+    {
+      "group": "econ",
+      "code": "ecai",
+      "name": "audio line in"
+    },
+    {
+      "group": "econ",
+      "code": "ecal",
+      "name": "audio line out"
+    },
+    {
+      "group": "econ",
+      "code": "ecao",
+      "name": "audio out"
+    },
+    {
+      "group": "econ",
+      "code": "eccm",
+      "name": "Comm slot"
+    },
+    {
+      "group": "econ",
+      "code": "ecen",
+      "name": "Ethernet"
+    },
+    {
+      "group": "econ",
+      "code": "ecfw",
+      "name": "FireWire"
+    },
+    {
+      "group": "econ",
+      "code": "ecir",
+      "name": "infrared"
+    },
+    {
+      "group": "econ",
+      "code": "eclt",
+      "name": "LocalTalk"
+    },
+    {
+      "group": "econ",
+      "code": "ecmi",
+      "name": "microphone"
+    },
+    {
+      "group": "econ",
+      "code": "ecmn",
+      "name": "monitor out"
+    },
+    {
+      "group": "econ",
+      "code": "ecmp",
+      "name": "modem port"
+    },
+    {
+      "group": "econ",
+      "code": "ecpc",
+      "name": "PC card"
+    },
+    {
+      "group": "econ",
+      "code": "ecpd",
+      "name": "PDS slot"
+    },
+    {
+      "group": "econ",
+      "code": "ecpi",
+      "name": "PCI bus"
+    },
+    {
+      "group": "econ",
+      "code": "ecpp",
+      "name": "printer port"
+    },
+    {
+      "group": "econ",
+      "code": "ecsc",
+      "name": "SCSI"
+    },
+    {
+      "group": "econ",
+      "code": "ecus",
+      "name": "USB"
+    },
+    {
+      "group": "econ",
+      "code": "ecvi",
+      "name": "video in"
+    },
+    {
+      "group": "econ",
+      "code": "ecvo",
+      "name": "video out"
+    },
+    {
+      "group": "econ",
+      "code": "empp",
+      "name": "modem printer port"
+    },
+    {
+      "group": "econ",
+      "code": "enub",
+      "name": "NuBus"
+    },
+    {
+      "group": "econ",
+      "code": "etok",
+      "name": "Token Ring"
+    },
+    {
+      "group": "edvt",
+      "code": "ecd ",
+      "name": "CD ROM drive"
+    },
+    {
+      "group": "edvt",
+      "code": "ecmi",
+      "name": "microphone"
+    },
+    {
+      "group": "edvt",
+      "code": "ecpc",
+      "name": "PC card"
+    },
+    {
+      "group": "edvt",
+      "code": "edds",
+      "name": "display"
+    },
+    {
+      "group": "edvt",
+      "code": "edlc",
+      "name": "LCD display"
+    },
+    {
+      "group": "edvt",
+      "code": "edmm",
+      "name": "modem"
+    },
+    {
+      "group": "edvt",
+      "code": "ednb",
+      "name": "NuBus card"
+    },
+    {
+      "group": "edvt",
+      "code": "edpd",
+      "name": "pointing device"
+    },
+    {
+      "group": "edvt",
+      "code": "edpi",
+      "name": "PCI card"
+    },
+    {
+      "group": "edvt",
+      "code": "edpr",
+      "name": "printer"
+    },
+    {
+      "group": "edvt",
+      "code": "edsp",
+      "name": "speakers"
+    },
+    {
+      "group": "edvt",
+      "code": "edst",
+      "name": "storage device"
+    },
+    {
+      "group": "edvt",
+      "code": "edtp",
+      "name": "trackpad"
+    },
+    {
+      "group": "edvt",
+      "code": "edvd",
+      "name": "DVD drive"
+    },
+    {
+      "group": "edvt",
+      "code": "edvm",
+      "name": "video monitor"
+    },
+    {
+      "group": "edvt",
+      "code": "efd ",
+      "name": "floppy disk drive"
+    },
+    {
+      "group": "edvt",
+      "code": "ehd ",
+      "name": "hard disk drive"
+    },
+    {
+      "group": "edvt",
+      "code": "ekbd",
+      "name": "keyboard"
+    },
+    {
+      "group": "edvt",
+      "code": "emou",
+      "name": "mouse"
+    },
+    {
+      "group": "edvt",
+      "code": "etrk",
+      "name": "trackball"
+    },
+    {
+      "group": "ekst",
+      "code": "ks$\u0000",
+      "name": "return key"
+    },
+    {
+      "group": "ekst",
+      "code": "ks0\u0000",
+      "name": "tab key"
+    },
+    {
+      "group": "ekst",
+      "code": "ks3\u0000",
+      "name": "delete key"
+    },
+    {
+      "group": "ekst",
+      "code": "ks5\u0000",
+      "name": "escape key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksG\u0000",
+      "name": "clear key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksL\u0000",
+      "name": "enter key"
+    },
+    {
+      "group": "ekst",
+      "code": "ks`\u0000",
+      "name": "F5 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksa\u0000",
+      "name": "F6 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksb\u0000",
+      "name": "F7 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksc\u0000",
+      "name": "F3 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksd\u0000",
+      "name": "F8 key"
+    },
+    {
+      "group": "ekst",
+      "code": "kse\u0000",
+      "name": "F9 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksg\u0000",
+      "name": "F11 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksi\u0000",
+      "name": "F13 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksk\u0000",
+      "name": "F14 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksm\u0000",
+      "name": "F10 key"
+    },
+    {
+      "group": "ekst",
+      "code": "kso\u0000",
+      "name": "F12 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksq\u0000",
+      "name": "F15 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksr\u0000",
+      "name": "help key"
+    },
+    {
+      "group": "ekst",
+      "code": "kss\u0000",
+      "name": "home key"
+    },
+    {
+      "group": "ekst",
+      "code": "kst\u0000",
+      "name": "page up key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksu\u0000",
+      "name": "forward del key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksv\u0000",
+      "name": "F4 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksw\u0000",
+      "name": "end key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksx\u0000",
+      "name": "F2 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksy\u0000",
+      "name": "page down key"
+    },
+    {
+      "group": "ekst",
+      "code": "ksz\u0000",
+      "name": "F1 key"
+    },
+    {
+      "group": "ekst",
+      "code": "ks{\u0000",
+      "name": "left arrow key"
+    },
+    {
+      "group": "ekst",
+      "code": "ks|\u0000",
+      "name": "right arrow key"
+    },
+    {
+      "group": "ekst",
+      "code": "ks}\u0000",
+      "name": "down arrow key"
+    },
+    {
+      "group": "ekst",
+      "code": "ks~\u0000",
+      "name": "up arrow key"
+    },
+    {
+      "group": "epro",
+      "code": "eadb",
+      "name": "ADB"
+    },
+    {
+      "group": "epro",
+      "code": "ebus",
+      "name": "bus"
+    },
+    {
+      "group": "epro",
+      "code": "ecfw",
+      "name": "FireWire"
+    },
+    {
+      "group": "epro",
+      "code": "ecpc",
+      "name": "PC card"
+    },
+    {
+      "group": "epro",
+      "code": "ecpi",
+      "name": "PCI bus"
+    },
+    {
+      "group": "epro",
+      "code": "ecsc",
+      "name": "SCSI"
+    },
+    {
+      "group": "epro",
+      "code": "ecus",
+      "name": "USB"
+    },
+    {
+      "group": "epro",
+      "code": "enub",
+      "name": "NuBus"
+    },
+    {
+      "group": "epro",
+      "code": "epat",
+      "name": "AppleTalk"
+    },
+    {
+      "group": "epro",
+      "code": "epau",
+      "name": "analog audio"
+    },
+    {
+      "group": "epro",
+      "code": "epda",
+      "name": "digital audio"
+    },
+    {
+      "group": "epro",
+      "code": "epip",
+      "name": "IP"
+    },
+    {
+      "group": "epro",
+      "code": "epir",
+      "name": "IrDA"
+    },
+    {
+      "group": "epro",
+      "code": "epit",
+      "name": "IRTalk"
+    },
+    {
+      "group": "epro",
+      "code": "epmv",
+      "name": "Macintosh video"
+    },
+    {
+      "group": "epro",
+      "code": "epps",
+      "name": "PostScript"
+    },
+    {
+      "group": "epro",
+      "code": "epsg",
+      "name": "SVGA"
+    },
+    {
+      "group": "epro",
+      "code": "epsr",
+      "name": "serial"
+    },
+    {
+      "group": "epro",
+      "code": "epsv",
+      "name": "S video"
+    },
+    {
+      "group": "just",
+      "code": "cent",
+      "name": "center"
+    },
+    {
+      "group": "just",
+      "code": "full",
+      "name": "full"
+    },
+    {
+      "group": "just",
+      "code": "left",
+      "name": "left"
+    },
+    {
+      "group": "just",
+      "code": "rght",
+      "name": "right"
+    },
+    {
+      "group": "kfrm",
+      "code": "ID  ",
+      "name": "id"
+    },
+    {
+      "group": "kfrm",
+      "code": "indx",
+      "name": "index"
+    },
+    {
+      "group": "kfrm",
+      "code": "name",
+      "name": "named"
+    },
+    {
+      "group": "misc",
+      "code": "cura",
+      "name": "current application"
+    },
+    {
+      "group": "prtn",
+      "code": "fpro",
+      "name": "formulas protected"
+    },
+    {
+      "group": "prtn",
+      "code": "modf",
+      "name": "read/write"
+    },
+    {
+      "group": "prtn",
+      "code": "nmod",
+      "name": "read only"
+    },
+    {
+      "group": "savo",
+      "code": "ask ",
+      "name": "ask"
+    },
+    {
+      "group": "savo",
+      "code": "no  ",
+      "name": "no"
+    },
+    {
+      "group": "savo",
+      "code": "yes ",
+      "name": "yes"
+    },
+    {
+      "group": "styl",
+      "code": "alcp",
+      "name": "all caps"
+    },
+    {
+      "group": "styl",
+      "code": "bold",
+      "name": "bold"
+    },
+    {
+      "group": "styl",
+      "code": "cond",
+      "name": "condensed"
+    },
+    {
+      "group": "styl",
+      "code": "hidn",
+      "name": "hidden"
+    },
+    {
+      "group": "styl",
+      "code": "ital",
+      "name": "italic"
+    },
+    {
+      "group": "styl",
+      "code": "lowc",
+      "name": "all lowercase"
+    },
+    {
+      "group": "styl",
+      "code": "outl",
+      "name": "outline"
+    },
+    {
+      "group": "styl",
+      "code": "pexp",
+      "name": "expanded"
+    },
+    {
+      "group": "styl",
+      "code": "plan",
+      "name": "plain"
+    },
+    {
+      "group": "styl",
+      "code": "sbsc",
+      "name": "subscript"
+    },
+    {
+      "group": "styl",
+      "code": "shad",
+      "name": "shadow"
+    },
+    {
+      "group": "styl",
+      "code": "smcp",
+      "name": "small caps"
+    },
+    {
+      "group": "styl",
+      "code": "spsc",
+      "name": "superscript"
+    },
+    {
+      "group": "styl",
+      "code": "strk",
+      "name": "strikethrough"
+    },
+    {
+      "group": "styl",
+      "code": "undl",
+      "name": "underline"
+    },
+    {
+      "group": "tran",
+      "code": "addo",
+      "name": "add over pixels"
+    },
+    {
+      "group": "tran",
+      "code": "addp",
+      "name": "add pin pixels"
+    },
+    {
+      "group": "tran",
+      "code": "admn",
+      "name": "ad min pixels"
+    },
+    {
+      "group": "tran",
+      "code": "admx",
+      "name": "ad max pixels"
+    },
+    {
+      "group": "tran",
+      "code": "bic ",
+      "name": "bic pixels"
+    },
+    {
+      "group": "tran",
+      "code": "blnd",
+      "name": "blend pixels"
+    },
+    {
+      "group": "tran",
+      "code": "cpy ",
+      "name": "copy pixels"
+    },
+    {
+      "group": "tran",
+      "code": "nbic",
+      "name": "not bic pixels"
+    },
+    {
+      "group": "tran",
+      "code": "ncpy",
+      "name": "not copy pixels"
+    },
+    {
+      "group": "tran",
+      "code": "ntor",
+      "name": "not or pixels"
+    },
+    {
+      "group": "tran",
+      "code": "nxor",
+      "name": "not xor pixels"
+    },
+    {
+      "group": "tran",
+      "code": "or  ",
+      "name": "or pixels"
+    },
+    {
+      "group": "tran",
+      "code": "subo",
+      "name": "sub over pixels"
+    },
+    {
+      "group": "tran",
+      "code": "subp",
+      "name": "sub pin pixels"
+    },
+    {
+      "group": "tran",
+      "code": "xor ",
+      "name": "xor pixels"
+    }
+  ]
+}

@@ -75,10 +75,11 @@ type Command struct {
 }
 
 type Dictionary struct {
-	Name     string
-	Commands map[EventCode]Command
-	Terms    map[Code4]string
-	Enums    map[Code4]string
+	Name      string
+	Commands  map[EventCode]Command
+	Terms     map[Code4]string
+	Enums     map[Code4]string
+	Constants map[EventCode]string
 }
 
 type Registry struct {
@@ -86,6 +87,9 @@ type Registry struct {
 	commands     map[EventCode]Command
 	terms        map[Code4]string
 	enums        map[Code4]string
+	constants    map[EventCode]string
+	language     *Dictionary
+	parameters   map[Code4]string
 }
 
 func New() *Registry {
@@ -94,6 +98,8 @@ func New() *Registry {
 		commands:     make(map[EventCode]Command),
 		terms:        make(map[Code4]string),
 		enums:        make(map[Code4]string),
+		constants:    make(map[EventCode]string),
+		parameters:   make(map[Code4]string),
 	}
 }
 
@@ -104,6 +110,11 @@ func (r *Registry) Dictionary(name string) (*Dictionary, bool) {
 
 func (r *Registry) Command(code EventCode) (Command, bool) {
 	value, ok := r.commands[code]
+	if !ok {
+		if canonical, alias := compatibilityEventAliases[code]; alias {
+			value, ok = r.commands[canonical]
+		}
+	}
 	return value, ok
 }
 
@@ -115,6 +126,51 @@ func (r *Registry) Term(code Code4) (string, bool) {
 func (r *Registry) Enumeration(code Code4) (string, bool) {
 	value, ok := r.enums[code]
 	return value, ok
+}
+
+func (r *Registry) Constant(code EventCode) (string, bool) {
+	value, ok := r.constants[code]
+	return value, ok
+}
+
+func (r *Registry) LanguageTerm(code Code4) (string, bool) {
+	if r.language == nil {
+		return "", false
+	}
+	value, ok := r.language.Terms[code]
+	return value, ok
+}
+
+func (r *Registry) LanguageEnumeration(code Code4) (string, bool) {
+	if r.language == nil {
+		return "", false
+	}
+	value, ok := r.language.Enums[code]
+	return value, ok
+}
+
+// Parameter returns a context-free language parameter name only when every
+// AppleScript command using code gives it the same name. Ambiguous codes must
+// be resolved through the specific Command instead.
+func (r *Registry) Parameter(code Code4) (string, bool) {
+	value, ok := r.parameters[code]
+	return value, ok
+}
+
+func (r *Registry) addLanguage(dictionary *Dictionary) {
+	r.language = dictionary
+	ambiguous := make(map[Code4]bool)
+	for _, command := range dictionary.Commands {
+		for code, parameter := range command.Parameters {
+			if name, exists := r.parameters[code]; exists && name != parameter.Name {
+				delete(r.parameters, code)
+				ambiguous[code] = true
+			} else if !ambiguous[code] {
+				r.parameters[code] = parameter.Name
+			}
+		}
+	}
+	r.Add(dictionary)
 }
 
 type xmlNode struct {
@@ -137,7 +193,10 @@ func ParseSDEF(name string, input io.Reader) (*Dictionary, error) {
 	if err := xml.NewDecoder(input).Decode(&root); err != nil {
 		return nil, fmt.Errorf("parse %s SDEF: %w", name, err)
 	}
-	d := &Dictionary{Name: name, Commands: make(map[EventCode]Command), Terms: make(map[Code4]string), Enums: make(map[Code4]string)}
+	d := &Dictionary{
+		Name: name, Commands: make(map[EventCode]Command), Terms: make(map[Code4]string),
+		Enums: make(map[Code4]string), Constants: make(map[EventCode]string),
+	}
 	var walk func(xmlNode) error
 	walk = func(node xmlNode) error {
 		switch node.XMLName.Local {
@@ -188,6 +247,20 @@ func ParseSDEF(name string, input io.Reader) (*Dictionary, error) {
 					}
 				}
 			}
+		case "enumeration":
+			groupText := node.attr("code")
+			if groupText != "" {
+				for _, child := range node.Nodes {
+					memberText, enumName := child.attr("code"), child.attr("name")
+					if child.XMLName.Local != "enumerator" || memberText == "" || enumName == "" {
+						continue
+					}
+					code, err := ParseEventCode(groupText + memberText)
+					if err == nil {
+						d.Constants[code] = enumName
+					}
+				}
+			}
 		}
 		for _, child := range node.Nodes {
 			if err := walk(child); err != nil {
@@ -219,10 +292,18 @@ func (r *Registry) Add(dictionary *Dictionary) {
 			r.enums[code] = name
 		}
 	}
+	for code, name := range dictionary.Constants {
+		if _, exists := r.constants[code]; !exists {
+			r.constants[code] = name
+		}
+	}
 }
 
 //go:embed data/*.sdef
 var bundled embed.FS
+
+//go:embed language.json
+var bundledLanguage []byte
 
 var (
 	defaultOnce     sync.Once
@@ -257,58 +338,27 @@ func Default() (*Registry, error) {
 		if additions, ok := defaultRegistry.dictionaries["StandardAdditions"]; ok {
 			defaultRegistry.dictionaries["Standard Additions"] = additions
 		}
-		addBuiltins(defaultRegistry)
+		language, err := ParseLanguageDefinition(bundledLanguage)
+		if err != nil {
+			defaultError = err
+			return
+		}
+		defaultRegistry.addLanguage(language)
 	})
 	return defaultRegistry, defaultError
 }
 
-func addBuiltins(registry *Registry) {
-	for codeText, name := range map[string]string{
-		"ascrcmnt": "log",
-		"ascrnoop": "launch",
-		"aevtoapp": "run",
-		"CoRedelo": "delete",
-		"CoRedoex": "exists",
+var compatibilityEventAliases = func() map[EventCode]EventCode {
+	aliases := make(map[EventCode]EventCode)
+	for alias, canonical := range map[string]string{
+		"CoRedelo": "coredelo",
+		"CoRedoex": "coredoex",
 	} {
-		code, err := ParseEventCode(codeText)
-		if err != nil {
-			continue
-		}
-		if _, exists := registry.commands[code]; !exists {
-			registry.commands[code] = Command{Code: code, Name: name, Parameters: map[Code4]Parameter{}}
+		aliasCode, aliasErr := ParseEventCode(alias)
+		canonicalCode, canonicalErr := ParseEventCode(canonical)
+		if aliasErr == nil && canonicalErr == nil {
+			aliases[aliasCode] = canonicalCode
 		}
 	}
-	for codeText, name := range map[string]string{
-		"leng": "length", "bool": "boolean", "long": "integer", "doub": "real", "TEXT": "string", "ctxt": "text",
-		"cobj": "item", "pcnt": "contents", "pnam": "name", "psxf": "POSIX file", "scpt": "script",
-		"citm": "text item", "obj ": "reference", "rvse": "reverse", "utxt": "Unicode text",
-		"null": "null", "insl": "location reference", "qdrt": "bounding rectangle",
-		"prdt": "with properties", "alrp": "replacing", "kocl": "new", "insh": "at",
-		"errn": "number", "ptlr": "partial result", "erob": "from", "errt": "to", "from": "from",
-		"prun": "running", "msng": "missing value", "rtyp": "as",
-		"txdl": "text item delimiters", "ascr": "AppleScript",
-		"fltp": "as", "kfil": "in", "ldt ": "date",
-		"wkdy": "weekday", "mnth": "month", "day ": "day", "year": "year",
-		"hour": "hours", "min ": "minutes", "scnd": "seconds", "days": "days",
-		"jan ": "January", "feb ": "February", "mar ": "March", "apr ": "April",
-		"may ": "May", "jun ": "June", "jul ": "July", "aug ": "August",
-		"sep ": "September", "oct ": "October", "nov ": "November", "dec ": "December",
-		"sun ": "Sunday", "mon ": "Monday", "tue ": "Tuesday", "wed ": "Wednesday",
-		"thu ": "Thursday", "fri ": "Friday", "sat ": "Saturday",
-		"FTPc": "path", "lnfd": "linefeed", "rslt": "result", "spac": "space", "strq": "quoted form",
-		"fixd": "fixed", "scrƒ": "scripts folder",
-		"asup": "application support",
-		"ID  ": "id", "tab ": "tab", "ret ": "return",
-		"case": "case", "diac": "diacriticals", "whit": "white space",
-		"hyph": "hyphens", "expa": "expansion", "punc": "punctuation",
-		"nume": "numeric strings",
-	} {
-		code, err := ParseCode4(codeText)
-		if err != nil {
-			continue
-		}
-		// AppleScript language terms are authoritative when an application
-		// dictionary reuses the same four-byte code (for example Mail's rtyp).
-		registry.terms[code] = name
-	}
-}
+	return aliases
+}()

@@ -307,6 +307,13 @@ func (f *Formatter) expr(expression Expr, parent int) string {
 			return "«class " + rawCode(node.Code) + "»"
 		}
 		if len(node.Code) == 8 {
+			var constant terminology.EventCode
+			copy(constant[:], node.Code)
+			if f.Terms != nil {
+				if name, ok := f.Terms.Constant(constant); ok {
+					return name
+				}
+			}
 			var member terminology.Code4
 			copy(member[:], node.Code[4:])
 			if f.Terms != nil {
@@ -388,7 +395,10 @@ func (f *Formatter) expr(expression Expr, parent int) string {
 				n := value.Name
 				if n == "" {
 					if f.Terms != nil {
-						n, _ = f.Terms.Term(value.Code)
+						n, _ = f.Terms.Parameter(value.Code)
+						if n == "" {
+							n, _ = f.Terms.Term(value.Code)
+						}
 					}
 					if n == "" {
 						n = "«class " + rawCode(value.Code[:]) + "»"
@@ -399,7 +409,10 @@ func (f *Formatter) expr(expression Expr, parent int) string {
 				n := value.Name
 				if n == "" {
 					if f.Terms != nil {
-						n, _ = f.Terms.Term(value.Code)
+						n, _ = f.Terms.Parameter(value.Code)
+						if n == "" {
+							n, _ = f.Terms.Term(value.Code)
+						}
 					}
 					if n == "" {
 						n = "«class " + rawCode(value.Code[:]) + "»"

@@ -42,6 +42,10 @@ func TestParseSDEF(t *testing.T) {
 	if d.Enums[fast] != "fast mode" {
 		t.Fatalf("enum = %#v", d.Enums)
 	}
+	modeFast, _ := ParseEventCode("modefast")
+	if d.Constants[modeFast] != "fast mode" {
+		t.Fatalf("grouped enum = %#v", d.Constants)
+	}
 }
 
 func TestBundledRegistry(t *testing.T) {
@@ -56,45 +60,50 @@ func TestBundledRegistry(t *testing.T) {
 		t.Fatal("Standard Additions alias missing")
 	}
 	errn, _ := ParseCode4("errn")
-	if got, ok := r.Term(errn); !ok || got != "number" {
-		t.Fatalf("errn term = %q, %v", got, ok)
+	if got, ok := r.Parameter(errn); !ok || got != "number" {
+		t.Fatalf("errn parameter = %q, %v", got, ok)
 	}
 }
 
-func TestLanguageBuiltins(t *testing.T) {
+func TestGeneratedLanguageTerminology(t *testing.T) {
 	registry, err := Default()
 	if err != nil {
 		t.Fatal(err)
 	}
 	for text, want := range map[string]string{
-		"rtyp": "as",
 		"txdl": "text item delimiters",
 		"ascr": "AppleScript",
-		"fltp": "as",
-		"kfil": "in",
 		"ldt ": "date",
 		"citm": "text item",
 		"obj ": "reference",
 		"rvse": "reverse",
 		"utxt": "Unicode text",
 		"wkdy": "weekday",
-		"mnth": "month",
-		"day ": "day",
-		"year": "year",
-		"hour": "hours",
-		"min ": "minutes",
-		"jan ": "January",
-		"dec ": "December",
-		"prdt": "with properties",
-		"alrp": "replacing",
+		"ID  ": "id",
+		"spac": "space",
 	} {
 		code, err := ParseCode4(text)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if got, ok := registry.Term(code); !ok || got != want {
-			t.Errorf("Term(%q) = %q, %v; want %q", text, got, ok, want)
+		if got, ok := registry.LanguageTerm(code); !ok || got != want {
+			t.Errorf("LanguageTerm(%q) = %q, %v; want %q", text, got, ok, want)
 		}
+	}
+	caseCode, _ := ParseCode4("case")
+	if got, ok := registry.LanguageEnumeration(caseCode); !ok || got != "case" {
+		t.Errorf("LanguageEnumeration(case) = %q, %v", got, ok)
+	}
+	consideringCase, _ := ParseEventCode("conscase")
+	if got, ok := registry.Constant(consideringCase); !ok || got != "case" {
+		t.Errorf("Constant(conscase) = %q, %v", got, ok)
+	}
+	expansion, _ := ParseCode4("expa")
+	if _, ok := registry.LanguageTerm(expansion); ok {
+		t.Error("framework terminology unexpectedly contains expa term")
+	}
+	if _, ok := registry.LanguageEnumeration(expansion); ok {
+		t.Error("framework terminology unexpectedly contains expa enumeration")
 	}
 }
 
@@ -105,6 +114,8 @@ func TestLanguageBuiltinCommands(t *testing.T) {
 	}
 	for codeText, want := range map[string]string{
 		"ascrnoop": "launch",
+		"coredelo": "delete",
+		"coredoex": "exists",
 		"CoRedelo": "delete",
 		"CoRedoex": "exists",
 	} {
@@ -118,28 +129,28 @@ func TestLanguageBuiltinCommands(t *testing.T) {
 	}
 }
 
-func TestLanguageSpecialConstantsOverrideApplicationTerms(t *testing.T) {
+func TestApplicationTermsAreNotOverwrittenByLanguageTerminology(t *testing.T) {
 	registry, err := Default()
 	if err != nil {
 		t.Fatal(err)
 	}
 	for codeText, want := range map[string]string{
-		"FTPc": "path",
-		"lnfd": "linefeed",
-		"rslt": "result",
-		"spac": "space",
-		"strq": "quoted form",
-		"TEXT": "string",
-		"ctxt": "text",
-		"asup": "application support",
-		"ID  ": "id",
-		"tab ": "tab",
-		"ret ": "return",
+		"rtyp": "rule type",
+		"asup": "application support folder",
+		"ID  ": "calendarIdentifier",
 	} {
 		code, _ := ParseCode4(codeText)
 		if got, ok := registry.Term(code); !ok || got != want {
 			t.Errorf("%s = %q, %v; want %q", codeText, got, ok, want)
 		}
+	}
+	id, _ := ParseCode4("ID  ")
+	if got, ok := registry.LanguageTerm(id); !ok || got != "id" {
+		t.Errorf("language ID = %q, %v; want id", got, ok)
+	}
+	rtyp, _ := ParseCode4("rtyp")
+	if got, ok := registry.Parameter(rtyp); !ok || got != "as" {
+		t.Errorf("language rtyp parameter = %q, %v; want as", got, ok)
 	}
 }
 
@@ -163,6 +174,28 @@ func TestContextualCommandParameters(t *testing.T) {
 		}
 		if got := command.Parameters[kocl].Name; got != want {
 			t.Errorf("%s kocl = %q, want %q", command.Name, got, want)
+		}
+	}
+	if got, ok := registry.Parameter(kocl); ok {
+		t.Errorf("ambiguous kocl received context-free name %q", got)
+	}
+}
+
+func TestGroupedEnumerationsRemainDistinct(t *testing.T) {
+	registry, err := Default()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for codeText, want := range map[string]string{
+		"afdrasup": "application support",
+		"afdmasup": "application support folder",
+	} {
+		code, err := ParseEventCode(codeText)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got, ok := registry.Constant(code); !ok || got != want {
+			t.Errorf("Constant(%q) = %q, %v; want %q", codeText, got, ok, want)
 		}
 	}
 }

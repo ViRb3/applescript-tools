@@ -1,5 +1,5 @@
-// Command terminology-generate derives the bundled scripting dictionaries and
-// their provenance from the applications listed in terminology/sources.json.
+// Command terminology-generate derives the AppleScript language terminology,
+// bundled application dictionaries, and their provenance.
 package main
 
 import (
@@ -32,9 +32,17 @@ type sourceEntry struct {
 }
 
 type report struct {
-	SchemaVersion int           `json:"schema_version"`
-	Host          hostInfo      `json:"host"`
-	Entries       []reportEntry `json:"entries"`
+	SchemaVersion int            `json:"schema_version"`
+	Host          hostInfo       `json:"host"`
+	Language      languageReport `json:"language"`
+	Entries       []reportEntry  `json:"entries"`
+}
+
+type languageReport struct {
+	Source          string `json:"source"`
+	TerminologyID   int    `json:"terminology_id"`
+	SHA256          string `json:"sha256"`
+	GeneratedSHA256 string `json:"generated_sha256"`
 }
 
 type hostInfo struct {
@@ -61,10 +69,11 @@ type generatedSnapshot struct {
 func main() {
 	manifestPath := flag.String("manifest", "terminology/sources.json", "terminology source manifest")
 	outputDir := flag.String("output-dir", "terminology/data", "generated SDEF directory")
+	languagePath := flag.String("language", "terminology/language.json", "generated AppleScript language terminology path")
 	reportPath := flag.String("provenance", "terminology/provenance.json", "generated JSON provenance path")
 	flag.Parse()
 
-	result, err := generate(*manifestPath, *outputDir)
+	result, err := generate(*manifestPath, *outputDir, *languagePath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -79,10 +88,10 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	fmt.Printf("generated %d SDEFs in %s and provenance in %s\n", len(result.Entries), *outputDir, *reportPath)
+	fmt.Printf("generated AppleScript language terminology, %d SDEFs in %s, and provenance in %s\n", len(result.Entries), *outputDir, *reportPath)
 }
 
-func generate(manifestPath, outputDir string) (*report, error) {
+func generate(manifestPath, outputDir, languagePath string) (*report, error) {
 	raw, err := os.ReadFile(manifestPath)
 	if err != nil {
 		return nil, fmt.Errorf("read source manifest: %w", err)
@@ -101,11 +110,27 @@ func generate(manifestPath, outputDir string) (*report, error) {
 	if err := os.MkdirAll(outputDir, 0o755); err != nil {
 		return nil, fmt.Errorf("create output directory: %w", err)
 	}
-	result := &report{SchemaVersion: 2, Host: hostInfo{
+	systemTerminology, err := extractSystemTerminology()
+	if err != nil {
+		return nil, err
+	}
+	language, err := parseSystemTerminology(systemTerminology)
+	if err != nil {
+		return nil, err
+	}
+	languageJSON, err := json.MarshalIndent(language, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("encode AppleScript language terminology: %w", err)
+	}
+	languageJSON = append(languageJSON, '\n')
+	result := &report{SchemaVersion: 3, Host: hostInfo{
 		ProductVersion: commandText("sw_vers", "-productVersion"),
 		BuildVersion:   commandText("sw_vers", "-buildVersion"),
 		Architecture:   runtime.GOARCH,
 		SdefPath:       sdefPath,
+	}, Language: languageReport{
+		Source: "OSAGetSysTerminology", TerminologyID: 0,
+		SHA256: digest(systemTerminology), GeneratedSHA256: digest(languageJSON),
 	}}
 	generated := make([]generatedSnapshot, 0, len(sources.Entries))
 	seenNames := make(map[string]bool)
@@ -154,6 +179,9 @@ func generate(manifestPath, outputDir string) (*report, error) {
 	}
 	if err := removeUnlistedSnapshots(outputDir, seenNames); err != nil {
 		return nil, err
+	}
+	if err := os.WriteFile(languagePath, languageJSON, 0o644); err != nil {
+		return nil, fmt.Errorf("write %s: %w", languagePath, err)
 	}
 	return result, nil
 }
